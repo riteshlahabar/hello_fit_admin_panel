@@ -1,0 +1,33 @@
+/*! -----------------------------------------------------------------------------------
+
+    Template Name: Cuba Admin
+    Template URI: http://admin.pixelstrap.com/cuba/theme
+    Description: This is Admin theme
+    Author: Pixelstrap
+    Author URI: https://themeforest.net/user/pixelstrap
+
+-----------------------------------------------------------------------------------
+
+    Ported from Cuba 4.8.26 (bootstrap/react_context/starter-kit) into this Vite
+    project. Cuba's original file is byte-identical to this one except for the
+    `~` prefixes, which are webpack syntax that Vite's resolver does not accept,
+    and the plugin stylesheets for libraries this panel does not install.
+    See ../../../README.md.
+
+ */
+
+@import 'bootstrap-scss/bootstrap.scss';
+@import 'color';
+@import 'vendors/chartist/chartist';
+@import 'vendors/themify.scss';
+@import 'vendors/whether-icon.scss';
+@import 'vendors/icofont.scss';
+@import 'vendors/flag-icon.scss';
+@import 'vendors/icoicon/icons';
+@import 'vendors/fontawesome.scss';
+@import 'vendors/animate/animate';
+@import 'vendors/sticky/sticky';
+@import 'vendors/todo/todo';
+
+// ReactToastify — rendered by Layout/Layout.tsx
+@import 'react-toastify/dist/ReactToastify.css';
