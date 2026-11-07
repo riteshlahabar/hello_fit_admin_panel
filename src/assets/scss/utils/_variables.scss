@@ -27,7 +27,10 @@ $secondary-color: #c1b19e;
 $success-color: #54ba4a;
 $info-color: #16c7f9;
 $warning-color: #ffaa05;
-$danger-color: #fc4438;
+// Deepened from Cuba's #fc4438, which sat almost on top of the new
+// $primary-color #e33e29 -- a Delete button was indistinguishable from a
+// primary one. Darker also reads as more serious for a destructive action.
+$danger-color: #b3261e;
 $light-color: #f4f4f4;
 $badge-light-color: #52526c;
 $light-gray: #ecf3fa;
