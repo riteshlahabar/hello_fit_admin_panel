@@ -13,6 +13,13 @@ $theme-body-sub-title-color: #52526c;
 $body-color: #f7eee4;
 $main-body-color: #fff6ec;
 
+// Sidebar active item. Cuba fills it with a tint of $primary-color, which
+// worked for its purple but turns pink at every opacity once the accent is
+// orange -- and leaves the orange label sitting on its own hue. The fill is a
+// neutral warm beige instead (--soft from the frontview palette), with the
+// orange label, icon and edge marker carrying the accent.
+$sidebar-active-bg: #f3e9dd;
+
 // Theme colors variables
 //
 // HelloFit brand accent, taken from the client's website design
