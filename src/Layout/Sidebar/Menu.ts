@@ -43,4 +43,24 @@ export const MENUITEMS: MenuGroup[] = [
       },
     ],
   },
+  {
+    menutitle: 'Configuration',
+    menucontent: 'Geography, languages and holidays',
+    Items: [
+      {
+        title: 'Masters',
+        icon: 'others',
+        type: 'sub',
+        active: false,
+        children: [
+          { path: '/masters/cities', title: 'Cities', type: 'link', active: false },
+          { path: '/masters/areas', title: 'Service Areas', type: 'link', active: false },
+          { path: '/masters/pincodes', title: 'Pincodes', type: 'link', active: false },
+          { path: '/masters/branches', title: 'Branches', type: 'link', active: false },
+          { path: '/masters/languages', title: 'Languages', type: 'link', active: false },
+          { path: '/masters/holidays', title: 'Holidays', type: 'link', active: false },
+        ],
+      },
+    ],
+  },
 ];

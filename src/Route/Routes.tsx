@@ -11,6 +11,12 @@
 
 import type { ReactNode } from 'react';
 import Dashboard from '../Components/Pages/Dashboard';
+import Cities from '../Components/Masters/Cities';
+import Areas from '../Components/Masters/Areas';
+import Pincodes from '../Components/Masters/Pincodes';
+import Branches from '../Components/Masters/Branches';
+import Languages from '../Components/Masters/Languages';
+import Holidays from '../Components/Masters/Holidays';
 
 export interface AppRoute {
   path: string;
@@ -19,4 +25,12 @@ export interface AppRoute {
 
 export const routes: AppRoute[] = [
   { path: `/dashboard/:layout`, Component: <Dashboard /> },
+
+  // Masters (spec 5.7) — backed by /admin/masters/* on the API.
+  { path: `/masters/cities/:layout`, Component: <Cities /> },
+  { path: `/masters/areas/:layout`, Component: <Areas /> },
+  { path: `/masters/pincodes/:layout`, Component: <Pincodes /> },
+  { path: `/masters/branches/:layout`, Component: <Branches /> },
+  { path: `/masters/languages/:layout`, Component: <Languages /> },
+  { path: `/masters/holidays/:layout`, Component: <Holidays /> },
 ];
