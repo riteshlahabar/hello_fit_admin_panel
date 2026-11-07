@@ -16,24 +16,29 @@
 @import 'utils/variables';
 
 :root {
-  --theme-deafult: #7366ff;
-  --theme-secondary: #f73164;
-  --light-background: rgba(242, 243, 247, 0.7);
+  // HelloFit brand accent from `website design frontview/` (--orange,
+  // --taupe). Cuba's own values were #7366ff / #f73164. The misspelling of
+  // `--theme-deafult` is Cuba's and is referenced across the theme -- do not
+  // "fix" it. Keep in step with $primary-color / $secondary-color in
+  // utils/_variables.scss and with Config/ThemeConfig.ts.
+  --theme-deafult: #e33e29;
+  --theme-secondary: #c1b19e;
+  --light-background: rgba(247, 238, 228, 0.7);
   --body-font-color: #2f2f3b;
   --chart-border: #ecf3fa;
   --recent-chart-bg: #fcfcfd;
-  --light-bg: #f6f7f9;
+  --light-bg: #f7eee4;
   --white: #fff;
-  --light2: #f5f6f9;
+  --light2: #f7eee4;
   --sidebar-border: rgba(0, 0, 0, 0.1);
   --chart-text-color: rgba(82, 82, 108, 0.8);
   --recent-dashed-border: rgba(82, 82, 108, 0.3);
   --chart-dashed-border: rgba(82, 82, 108, 0.2);
   --chart-progress-light: rgba(82, 82, 108, 0.1);
-  --recent-box-bg: #f2f4f7;
+  --recent-box-bg: #f7eee4;
   --recent-border: rgba(97, 101, 122, 0.25);
   --course-light-btn: #f2f3f7;
-  --course-bg: #f7f7f7;
+  --course-bg: #f7eee4;
   --balance-profie-bg: #e0dfef;
   --view-grid-bg: #ecf3fa80;
   --view-border-marker: #cfcdfc;

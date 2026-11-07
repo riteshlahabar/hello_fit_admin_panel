@@ -2,12 +2,28 @@
 $theme-font-color: #242934;
 $theme-body-font-color: #2f2f3b;
 $theme-body-sub-title-color: #52526c;
-$body-color: #f8f8f8;
-$main-body-color: #f7f8f9;
+// Page backgrounds, warmed to the client's website palette
+// (`website design frontview/index.html`): --ivory #FFF6EC behind the content,
+// --soft #f7eee4 for the recessed surfaces inside it. Cuba's own values were
+// the cool greys #f8f8f8 / #f7f8f9.
+//
+// $main-body-color is the one that matters most -- it paints
+// `.page-body-wrapper`, i.e. the whole area behind the cards. Cards stay white
+// (`--white`), so they lift off the ivory rather than blending into it.
+$body-color: #f7eee4;
+$main-body-color: #fff6ec;
 
 // Theme colors variables
-$primary-color: #7366ff;
-$secondary-color: #ff3364;
+//
+// HelloFit brand accent, taken from the client's website design
+// (`website design frontview/index.html`): --orange #E33E29 and --taupe
+// #C1B19E. Cuba's own values were #7366ff / #ff3364.
+//
+// Only the accent is rebranded. The greys, surfaces and body colours above and
+// below stay Cuba's -- the frontview's warm ivory palette (#FFF6EC, #f7eee4)
+// is built for a marketing page and washes out dense admin tables.
+$primary-color: #e33e29;
+$secondary-color: #c1b19e;
 $success-color: #54ba4a;
 $info-color: #16c7f9;
 $warning-color: #ffaa05;

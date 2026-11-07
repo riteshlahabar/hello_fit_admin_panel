@@ -35,8 +35,12 @@ export class ConfigDB {
       sidebar_setting: 'default-sidebar',
     },
     color: {
-      primary_color: localStorage.getItem('default_color') || '#7366ff',
-      secondary_color: localStorage.getItem('secondary_color') || '#f73164',
+      // HelloFit brand accent from `website design frontview/` (--orange,
+      // --taupe). Cuba's own values were #7366ff / #f73164. These must match
+      // --theme-deafult / --theme-secondary in assets/scss/style.scss and
+      // $primary-color / $secondary-color in assets/scss/utils/_variables.scss.
+      primary_color: localStorage.getItem('default_color') || '#e33e29',
+      secondary_color: localStorage.getItem('secondary_color') || '#c1b19e',
       mix_background_layout: 'light-only',
     },
     router_animation: 'fadeIn',
