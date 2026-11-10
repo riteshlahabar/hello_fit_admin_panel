@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
-import StatusBadge from './StatusBadge';
-import CrudPage from './CrudPage';
-import type { ColumnDef, FieldDef } from './CrudPage';
+import StatusBadge from '../Common/StatusBadge';
+import CrudPage from '../Common/CrudPage';
+import type { ColumnDef, FieldDef } from '../Common/CrudPage';
 import { mastersApi } from '../../Services/masters.api';
 import type { ServiceArea } from '../../Services/masters.api';
 import { useBranchOptions, useCityOptions } from './useCityOptions';
@@ -53,7 +53,6 @@ const Areas = () => {
     <CrudPage<ServiceArea>
       title='Service Areas'
       singular='Service Area'
-      description='Serviceable zones inside a city. An address with no matching active area is what triggers the “coming soon” state in the app.'
       columns={columns}
       fields={fields}
       load={load}

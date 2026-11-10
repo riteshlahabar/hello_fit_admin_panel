@@ -1,0 +1,58 @@
+// Route transition animation — NOT from Cuba, because Cuba's does not work.
+//
+// Cuba's Layout.jsx renders
+//   <CSSTransition classNames={animationTheme} timeout={100}>
+// with `animationTheme` being an animate.css name such as `fadeIn`.
+// react-transition-group turns `classNames="fadeIn"` into the generated
+// classes `fadeIn-enter`, `fadeIn-enter-active`, `fadeIn-exit` and so on —
+// none of which exist in animate.css, which ships `.animated` plus a bare
+// `.fadeIn`. So the classes land on the element and match no rule, and the
+// template's route animation silently does nothing. (Its timeout of 100ms
+// would also have cut animate.css's 1s animations short.)
+//
+// This bridges the generated names onto Cuba's own keyframes, which are
+// already loaded by vendors/animate. Duration is 400ms rather than
+// animate.css's default 1s: a page transition an admin sits through on every
+// click needs to be quick, and 1s is long enough to feel like lag while
+// filling a form. Keep `$route-animation-duration` in step with the
+// `timeout` prop in Layout/Layout.tsx.
+
+$route-animation-duration: 400ms;
+
+// The names offered in Config/ThemeConfig.ts. Add to this list to add a
+// choice; every one of these has keyframes in vendors/animate.
+$route-animations: fadeIn, fadeInUp, fadeInDown, fadeInLeft, fadeInRight,
+  zoomIn, slideInUp, slideInLeft, slideInRight, bounceIn;
+
+@each $name in $route-animations {
+  .#{$name}-enter {
+    opacity: 0;
+  }
+
+  .#{$name}-enter-active {
+    animation-name: $name;
+    animation-duration: $route-animation-duration;
+    animation-fill-mode: both;
+    animation-timing-function: ease;
+  }
+
+  // No exit animation. The outgoing page is unmounted (`unmountOnExit`) and
+  // animating it out would mean both pages on screen at once, which shifts
+  // the content under the cursor mid-click.
+  .#{$name}-exit {
+    display: none;
+  }
+}
+
+// Respect the OS setting. An admin who has asked for reduced motion is told
+// by the browser, and a transition on every navigation is exactly the kind
+// of thing that setting exists for.
+@media (prefers-reduced-motion: reduce) {
+  @each $name in $route-animations {
+    .#{$name}-enter,
+    .#{$name}-enter-active {
+      animation: none;
+      opacity: 1;
+    }
+  }
+}

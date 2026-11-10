@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
-import StatusBadge from './StatusBadge';
-import CrudPage from './CrudPage';
-import type { ColumnDef, FieldDef } from './CrudPage';
+import StatusBadge from '../Common/StatusBadge';
+import CrudPage from '../Common/CrudPage';
+import type { ColumnDef, FieldDef } from '../Common/CrudPage';
 import { mastersApi } from '../../Services/masters.api';
 import type { City } from '../../Services/masters.api';
 
@@ -31,7 +31,6 @@ const fields: FieldDef<City>[] = [
     name: 'launchDate',
     label: 'Launch date',
     type: 'date',
-    help: 'The calendar day the city goes live.',
   },
   { name: 'isActive', label: 'Active', type: 'checkbox', defaultValue: true },
 ];
@@ -47,7 +46,6 @@ const Cities = () => {
     <CrudPage<City>
       title='Cities'
       singular='City'
-      description='Where the service operates. A city cannot be retired while areas, branches or customer addresses still point at it.'
       columns={columns}
       fields={fields}
       load={load}

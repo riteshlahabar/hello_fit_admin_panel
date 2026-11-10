@@ -1,2 +1,10 @@
-// Ported verbatim from Cuba 4.8.26 -- src/index.scss.
+// Ported verbatim from Cuba 4.8.26 — src/index.scss.
 @import './assets/scss/app.scss';
+
+// Ours, loaded after Cuba so it can reach its keyframes. See the file for why
+// Cuba's own route animation does not work.
+@import './styles/route-animation.scss';
+
+// Ours. The card header pads by 30px; Cuba's table sits outside CardBody and
+// does not. See the file.
+@import './styles/crud-table.scss';

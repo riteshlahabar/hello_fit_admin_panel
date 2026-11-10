@@ -81,7 +81,7 @@ export interface ListQuery {
   [key: string]: string | number | boolean | undefined;
 }
 
-function qs(query: ListQuery): string {
+export function qs(query: ListQuery): string {
   const parts = Object.entries(query)
     .filter(([, v]) => v !== undefined && v !== '' && v !== false)
     .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(String(v))}`);
@@ -95,8 +95,13 @@ export interface Listed<T> {
 
 const EMPTY_META: PageMeta = { page: 1, limit: 20, total: 0, pages: 1 };
 
-/** Unwraps a list response into rows + meta, or surfaces the error message. */
-async function listed<T>(
+/**
+ * Unwraps a list response into rows + meta, or surfaces the error message.
+ *
+ * Exported alongside `qs` because every admin list endpoint answers the same
+ * envelope: `admins.api.ts` shares these rather than growing a second copy.
+ */
+export async function listed<T>(
   result: ApiResult<T[]>,
 ): Promise<{ ok: true; value: Listed<T> } | { ok: false; message: string }> {
   if (!result.ok) return { ok: false, message: result.error.message };

@@ -12,6 +12,13 @@
 // Factored into one component rather than copied six times: the six masters
 // differ only in their columns and their form fields, and six near-identical
 // copies is where they start drifting apart.
+//
+// It now backs the Administration screens too (admin users, roles), which is
+// why `rowActions` and `inactiveLabel` exist: those two have actions the API
+// exposes as their own routes rather than as a PATCH of the row — a status
+// change, a password reset, a permission set — and they page off
+// `includeDeleted` rather than `includeInactive`. The screen's own `load`
+// maps the flag; nothing in here knows which name the API used.
 
 import { Fragment, useCallback, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
@@ -41,7 +48,15 @@ import type { Listed, PageMeta } from '../../Services/masters.api';
 export interface FieldDef<T> {
   name: string;
   label: string;
-  type?: 'text' | 'number' | 'date' | 'checkbox' | 'select' | 'textarea';
+  type?:
+    | 'text'
+    | 'number'
+    | 'date'
+    | 'checkbox'
+    | 'select'
+    | 'textarea'
+    | 'email'
+    | 'password';
   /** Options for `select`. */
   options?: { value: string; label: string }[];
   required?: boolean;
@@ -49,6 +64,8 @@ export interface FieldDef<T> {
   help?: string;
   /** Hide the field when editing — e.g. a parent that must not be moved. */
   createOnly?: boolean;
+  /** Full-width rather than Cuba's default half. */
+  wide?: boolean;
   /** Initial value when adding. */
   defaultValue?: string | number | boolean;
   /** Pull the edit value out of the row when it is not a plain field. */
@@ -67,8 +84,6 @@ export interface CrudPageProps<T extends { id: string }> {
   singular: string;
   /** Breadcrumb trail under "Masters". */
   parent?: string;
-  /** Sentence under the card title, Cuba renders it as a muted span. */
-  description?: string;
   columns: ColumnDef<T>[];
   fields: FieldDef<T>[];
   load: (query: {
@@ -92,6 +107,21 @@ export interface CrudPageProps<T extends { id: string }> {
   reloadKey?: string | number;
   /** Masters with no isActive column hide the "show inactive" switch. */
   hasActiveFlag?: boolean;
+  /** Wording for that switch — admin users show removed, not retired. */
+  inactiveLabel?: string;
+  /** Hide the search box where the endpoint has no `q` — the role list. */
+  hasSearch?: boolean;
+  /** Width of the Actions column. Fixed layout needs a real value here —
+   * size it to the buttons the screen renders so the last one lands on the
+   * 30px gutter. */
+  actionsWidth?: string;
+  /** Hide the delete button per row — a built-in role cannot be deleted. */
+  canDelete?: (row: T) => boolean;
+  /**
+   * Buttons rendered before Edit, for actions the API exposes as their own
+   * route. `refresh` re-reads the current page once the action lands.
+   */
+  rowActions?: (row: T, refresh: () => void) => ReactNode;
 }
 
 type FormState = Record<string, string | number | boolean>;
@@ -126,7 +156,6 @@ const CrudPage = <T extends { id: string }>({
   title,
   singular,
   parent = 'Masters',
-  description,
   columns,
   fields,
   load,
@@ -137,6 +166,11 @@ const CrudPage = <T extends { id: string }>({
   toolbar,
   reloadKey,
   hasActiveFlag = true,
+  inactiveLabel = 'Show retired',
+  hasSearch = true,
+  actionsWidth = '225px',
+  canDelete,
+  rowActions,
 }: CrudPageProps<T>) => {
   const [rows, setRows] = useState<T[]>([]);
   const [meta, setMeta] = useState<PageMeta>({
@@ -255,30 +289,32 @@ const CrudPage = <T extends { id: string }>({
             <Card>
               <CardHeader>
                 <Row className='align-items-center'>
-                  <Col md='5'>
+                  <Col md='3'>
                     <H3>{title}</H3>
-                    {description ? <span>{description}</span> : null}
                   </Col>
-                  <Col md='7'>
+                  <Col md='9'>
                     <div className='d-flex flex-wrap gap-2 justify-content-md-end align-items-center'>
                       {toolbar}
-                      <Form className='d-flex gap-2' onSubmit={onSearch}>
-                        <Input
-                          type='search'
-                          bsSize='sm'
-                          placeholder='Search…'
-                          value={q}
-                          onChange={(e) => setQ(e.target.value)}
-                        />
-                        <Btn
-                          attrBtn={{
-                            color: 'light',
-                            size: 'sm',
-                            type: 'submit',
-                          }}>
-                          Search
-                        </Btn>
-                      </Form>
+                      {hasSearch ? (
+                        <Form className='d-flex gap-2' onSubmit={onSearch}>
+                          <Input
+                            type='search'
+                            className='hf-filter-control'
+                            bsSize='sm'
+                            placeholder='Search…'
+                            value={q}
+                            onChange={(e) => setQ(e.target.value)}
+                          />
+                          <Btn
+                            attrBtn={{
+                              color: 'light',
+                              size: 'sm',
+                              type: 'submit',
+                            }}>
+                            Search
+                          </Btn>
+                        </Form>
+                      ) : null}
                       {hasActiveFlag ? (
                         <div className='form-check form-switch mb-0'>
                           <Input
@@ -294,7 +330,7 @@ const CrudPage = <T extends { id: string }>({
                           <Label
                             className='form-check-label mb-0'
                             for='includeInactive'>
-                            Show retired
+                            {inactiveLabel}
                           </Label>
                         </div>
                       ) : null}
@@ -312,7 +348,7 @@ const CrudPage = <T extends { id: string }>({
               </CardHeader>
 
               <div className='table-responsive'>
-                <Table hover={true} className='table-border-horizontal'>
+                <Table hover={true} className='table-border-horizontal hf-crud-table'>
                   <thead>
                     <tr>
                       {columns.map((c) => (
@@ -320,7 +356,7 @@ const CrudPage = <T extends { id: string }>({
                           {c.header}
                         </th>
                       ))}
-                      <th scope='col' className='text-end'>
+                      <th scope='col' style={{ width: actionsWidth }}>
                         Actions
                       </th>
                     </tr>
@@ -348,25 +384,29 @@ const CrudPage = <T extends { id: string }>({
                           {columns.map((c) => (
                             <td key={c.header}>{c.cell(row)}</td>
                           ))}
-                          <td className='text-end'>
-                            <Btn
-                              attrBtn={{
-                                color: 'light',
-                                size: 'sm',
-                                className: 'me-2',
-                                onClick: () => openEdit(row),
-                              }}>
-                              Edit
-                            </Btn>
-                            <Btn
-                              attrBtn={{
-                                color: 'danger',
-                                size: 'sm',
-                                outline: true,
-                                onClick: () => void onDelete(row),
-                              }}>
-                              {deleteVerb}
-                            </Btn>
+                          <td>
+                            <div className='d-flex gap-2 justify-content-center'>
+                              {rowActions?.(row, () => void refresh())}
+                              <Btn
+                                attrBtn={{
+                                  color: 'light',
+                                  size: 'sm',
+                                  onClick: () => openEdit(row),
+                                }}>
+                                Edit
+                              </Btn>
+                              {!canDelete || canDelete(row) ? (
+                                <Btn
+                                  attrBtn={{
+                                    color: 'danger',
+                                    size: 'sm',
+                                    outline: true,
+                                    onClick: () => void onDelete(row),
+                                  }}>
+                                  {deleteVerb}
+                                </Btn>
+                              ) : null}
+                            </div>
                           </td>
                         </tr>
                       ))
@@ -376,7 +416,7 @@ const CrudPage = <T extends { id: string }>({
               </div>
 
               {meta.pages > 1 ? (
-                <div className='d-flex justify-content-between align-items-center p-3'>
+                <div className='d-flex justify-content-between align-items-center hf-crud-foot'>
                   <span className='f-light'>
                     {meta.total} total · page {meta.page} of {meta.pages}
                   </span>
@@ -422,7 +462,9 @@ const CrudPage = <T extends { id: string }>({
               {fields
                 .filter((f) => !(editing && f.createOnly))
                 .map((f) => (
-                  <FormGroup className='col-md-6' key={f.name}>
+                  <FormGroup
+                    className={f.wide ? 'col-md-12' : 'col-md-6'}
+                    key={f.name}>
                     {f.type === 'checkbox' ? (
                       <div className='form-check form-switch mt-4'>
                         <Input

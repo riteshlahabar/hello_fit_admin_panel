@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
-import StatusBadge from './StatusBadge';
-import CrudPage from './CrudPage';
-import type { ColumnDef, FieldDef } from './CrudPage';
+import StatusBadge from '../Common/StatusBadge';
+import CrudPage from '../Common/CrudPage';
+import type { ColumnDef, FieldDef } from '../Common/CrudPage';
 import { mastersApi } from '../../Services/masters.api';
 import type { Branch } from '../../Services/masters.api';
 import { useCityOptions } from './useCityOptions';
@@ -52,7 +52,6 @@ const Branches = () => {
     <CrudPage<Branch>
       title='Branches'
       singular='Branch'
-      description='Operating branches. Teachers and service areas attach to a branch, and a branch cannot be retired while either still does.'
       columns={columns}
       fields={fields}
       load={load}

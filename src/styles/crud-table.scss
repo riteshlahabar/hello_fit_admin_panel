@@ -1,0 +1,123 @@
+// Edge gutter for the CrudPage table — ours, not Cuba's.
+//
+// Cuba's card header pads its contents by 30px (`$card-padding`, used by
+// components/_card.scss). Its table pattern puts the table *outside*
+// `CardBody`, in a bare `div.table-responsive`, so the only horizontal space a
+// cell gets is its own `0.75rem` from components/_table.scss. The first and
+// last columns therefore sit flush against the card border and their text
+// lands 12px in, 18px short of the heading above it.
+//
+// That is faithful to Cuba — its own tables look the same — so this is a
+// **deliberate departure from the template**, asked for by the client, in the
+// same category as the palette rebrand. It is kept here rather than edited
+// into `components/_table.scss` so that ported Cuba pages keep the template's
+// spacing unless they opt in with `.hf-crud-table`.
+//
+// Logical properties, not padding-left/right: Cuba ships an RTL layout
+// (layout/_rtl.scss) and these flip on their own.
+
+$hf-table-gutter: 30px;
+
+.hf-crud-table {
+  // Equal column widths, so the gap between every pair of columns is the same.
+  //
+  // Auto layout sizes every column to its content — "Name" took 633px next to
+  // a 64px "Areas" — and no width hint overrides that reliably, because
+  // min-content always wins. `table-layout: fixed` is the only thing that
+  // forces true equality: it divides the width equally between every column
+  // that has no explicit width of its own.
+  //
+  // The Actions column is the one exception and *must* carry an explicit
+  // width (CrudPage sets it inline from `actionsWidth`), because under fixed
+  // layout it would otherwise take the same share as a data column and squash
+  // its buttons. Giving it a real width also leaves the data columns to split
+  // what remains, equally.
+  table-layout: fixed;
+
+  > thead > tr,
+  > tbody > tr {
+    // Outer edge only — the gutter between columns stays Cuba's 0.75rem.
+    > :first-child {
+      padding-inline-start: $hf-table-gutter;
+    }
+
+    // The Actions column is always last; its width comes from CrudPage's
+    // inline `actionsWidth`, sized to the buttons that screen renders, so the
+    // last button lands on the 30px gutter rather than floating in a column
+    // that took whatever width was going.
+    > :last-child {
+      padding-inline-end: $hf-table-gutter;
+      white-space: nowrap;
+    }
+
+    // Cells centred under their heading. Client instruction, 9 Nov 2026.
+    > th,
+    > td {
+      text-align: center;
+      vertical-align: middle;
+
+      // Fixed layout clips rather than widens, so a long value — an email, a
+      // branch name — has to be allowed to break inside the word or it runs
+      // under the next column.
+      overflow-wrap: anywhere;
+    }
+
+    // ...except the first column, which anchors to the card's 30px gutter
+    // instead. Centring and "30px from the left" cannot both hold in a column
+    // wider than its content — centred, the name landed ~130px in and did not
+    // line up with its own heading.
+    //
+    // The Actions column *is* centred, heading and buttons alike, which only
+    // lines up because `actionsWidth` is set to the span its buttons actually
+    // need (measure it; four buttons on Admin Users span 415px, two on the
+    // masters screens 179px) plus this gutter. Size it short and the buttons
+    // overflow the cell leftwards into the previous column.
+    > :first-child {
+      text-align: start;
+    }
+  }
+
+  // The header bar, in the project palette rather than Cuba's transparent
+  // thead. `$body-color` (#f7eee4) is the frontview's "soft" recessed
+  // surface — the same token that paints the page behind the cards — so the
+  // bar reads as a recess in the white card rather than a new colour.
+  //
+  // `--bs-table-bg` rather than `background-color`: Bootstrap paints cells
+  // with `background-color: var(--bs-table-bg)` plus an inset box-shadow for
+  // striping, so setting the variable survives both instead of fighting them.
+  > thead > tr > th {
+    --bs-table-bg: #{$body-color};
+    background-color: $body-color;
+    color: $theme-body-font-color;
+  }
+}
+
+// Cuba's dark theme repaints the card; the bar follows it rather than staying
+// a light beige hole in a dark card.
+body.dark-only .hf-crud-table > thead > tr > th {
+  --bs-table-bg: #{$dark-card-inbox};
+  background-color: $dark-card-inbox;
+  color: $dark-all-font-color;
+}
+
+// The pagination strip below the table, lined up with the same gutter. Its
+// vertical padding stays at Bootstrap's `p-3` value so the row keeps its
+// height.
+.hf-crud-foot {
+  padding: 16px $hf-table-gutter;
+}
+
+// Filter controls in the card header — the search box and any select a screen
+// adds through `toolbar`.
+//
+// A bare reactstrap `Input type='select'` is `.form-select`, i.e. `width: 100%`,
+// so each filter claimed the whole flex line and landed on a row of its own:
+// Admin Users had its role and status selects stacked above the search box at
+// 694px each. One width for all of them puts them on the search box's row.
+//
+// This stylesheet is imported after Bootstrap, so it wins the tie with
+// `.form-select` / `.form-control` on equal specificity.
+.hf-filter-control {
+  width: 165px;
+  flex: 0 0 auto;
+}

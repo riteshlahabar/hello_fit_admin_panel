@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
-import StatusBadge from './StatusBadge';
-import CrudPage from './CrudPage';
-import type { ColumnDef, FieldDef } from './CrudPage';
+import StatusBadge from '../Common/StatusBadge';
+import CrudPage from '../Common/CrudPage';
+import type { ColumnDef, FieldDef } from '../Common/CrudPage';
 import { mastersApi } from '../../Services/masters.api';
 import type { Holiday } from '../../Services/masters.api';
 import { useCityOptions } from './useCityOptions';
@@ -48,7 +48,6 @@ const Holidays = () => {
       type: 'select',
       options: cities,
       createOnly: true,
-      help: 'Leave blank for a national holiday.',
     },
     {
       name: 'blocksBooking',
@@ -62,7 +61,6 @@ const Holidays = () => {
     <CrudPage<Holiday>
       title='Holidays'
       singular='Holiday'
-      description='Days the slot engine treats as closed. A holiday with no city is national. Deleting one removes it outright — nothing references a holiday by id.'
       columns={columns}
       fields={fields}
       load={load}

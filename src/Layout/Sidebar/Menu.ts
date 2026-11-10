@@ -63,4 +63,30 @@ export const MENUITEMS: MenuGroup[] = [
       },
     ],
   },
+  {
+    menutitle: 'Administration',
+    menucontent: 'Staff accounts and what they can reach',
+    Items: [
+      {
+        title: 'Administration',
+        icon: 'user',
+        type: 'sub',
+        active: false,
+        children: [
+          {
+            path: '/administration/admin-users',
+            title: 'Admin Users',
+            type: 'link',
+            active: false,
+          },
+          {
+            path: '/administration/roles',
+            title: 'Roles & Permissions',
+            type: 'link',
+            active: false,
+          },
+        ],
+      },
+    ],
+  },
 ];

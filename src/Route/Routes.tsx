@@ -17,6 +17,8 @@ import Pincodes from '../Components/Masters/Pincodes';
 import Branches from '../Components/Masters/Branches';
 import Languages from '../Components/Masters/Languages';
 import Holidays from '../Components/Masters/Holidays';
+import AdminUsers from '../Components/Administration/AdminUsers';
+import Roles from '../Components/Administration/Roles';
 
 export interface AppRoute {
   path: string;
@@ -33,4 +35,10 @@ export const routes: AppRoute[] = [
   { path: `/masters/branches/:layout`, Component: <Branches /> },
   { path: `/masters/languages/:layout`, Component: <Languages /> },
   { path: `/masters/holidays/:layout`, Component: <Holidays /> },
+
+  // Administration (spec 5.8) — /admin/admin-users/* and /admin/roles/* on
+  // the API. Both are Super Admin only by default: the seed grants the
+  // `admins` permission module to that role alone.
+  { path: `/administration/admin-users/:layout`, Component: <AdminUsers /> },
+  { path: `/administration/roles/:layout`, Component: <Roles /> },
 ];

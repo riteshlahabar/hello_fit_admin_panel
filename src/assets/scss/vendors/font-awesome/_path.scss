@@ -1,14 +1,34 @@
 /* FONT PATH
  * -------------------------- */
 
+/* Ported from Cuba 4.8.26 -- src/assets/scss/vendors/font-awesome/_path.scss.
+ *
+ * Changed: the `$fa-font-path` and `$fa-version` interpolations are written out
+ * as the literal values they expand to.
+ *
+ * Why: Vite rebases a relative `url()` in Sass against the file that declares
+ * it, but only when the path is a literal — an interpolated one is emitted
+ * untouched and then resolves against the *page* URL, so it 404s in dev and in
+ * the build. The FontAwesome face ended up in `status: "error"` and every
+ * `fa-*` glyph rendered as tofu. The visible one was the sidebar accordion
+ * arrow: `<i class="fa fa-angle-right">` is `content: '\f105'` in this font,
+ * so expanding a menu showed a box instead of an arrow.
+ *
+ * Same bug, same fix as `vendors/themify/_path.scss` — see the note there.
+ * The version query is inlined too rather than left as `?v=#{$fa-version}`,
+ * so nothing in the url() is interpolated.
+ *
+ * `$fa-font-path` and `$fa-version` (vendors/font-awesome/_variables.scss)
+ * still hold the same values and are left in place.
+ */
 @font-face {
   font-family: 'FontAwesome';
-  src: url('#{$fa-font-path}/font-awesome/fontawesome-webfont.eot?v=#{$fa-version}');
-  src: url('#{$fa-font-path}/font-awesome/fontawesome-webfont.eot?#iefix&v=#{$fa-version}') format('embedded-opentype'),
-    url('#{$fa-font-path}/font-awesome/fontawesome-webfont.woff2?v=#{$fa-version}') format('woff2'),
-    url('#{$fa-font-path}/font-awesome/fontawesome-webfont.woff?v=#{$fa-version}') format('woff'),
-    url('#{$fa-font-path}/font-awesome/fontawesome-webfont.ttf?v=#{$fa-version}') format('truetype'),
-    url('#{$fa-font-path}/font-awesome/fontawesome-webfont.svg?v=#{$fa-version}#fontawesomeregular') format('svg');
+  src: url('../../../fonts/font-awesome/fontawesome-webfont.eot?v=4.7.0');
+  src: url('../../../fonts/font-awesome/fontawesome-webfont.eot?#iefix&v=4.7.0') format('embedded-opentype'),
+    url('../../../fonts/font-awesome/fontawesome-webfont.woff2?v=4.7.0') format('woff2'),
+    url('../../../fonts/font-awesome/fontawesome-webfont.woff?v=4.7.0') format('woff'),
+    url('../../../fonts/font-awesome/fontawesome-webfont.ttf?v=4.7.0') format('truetype'),
+    url('../../../fonts/font-awesome/fontawesome-webfont.svg?v=4.7.0#fontawesomeregular') format('svg');
 
   font-weight: normal;
   font-style: normal;

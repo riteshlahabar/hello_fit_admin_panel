@@ -43,7 +43,9 @@ export class ConfigDB {
       secondary_color: localStorage.getItem('secondary_color') || '#c1b19e',
       mix_background_layout: 'light-only',
     },
-    router_animation: 'fadeIn',
+    // Bridged onto Cuba's animate.css keyframes by styles/route-animation.scss;
+    // any name in its $route-animations list is valid.
+    router_animation: 'fadeInUp',
   };
 }
 

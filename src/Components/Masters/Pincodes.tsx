@@ -2,9 +2,9 @@ import { useCallback, useState } from 'react';
 import { Button, Form, Input, Label, Modal, ModalBody } from 'reactstrap';
 import { toast } from 'react-toastify';
 import { Btn, H5 } from '../../AbstractElements';
-import StatusBadge from './StatusBadge';
-import CrudPage from './CrudPage';
-import type { ColumnDef, FieldDef } from './CrudPage';
+import StatusBadge from '../Common/StatusBadge';
+import CrudPage from '../Common/CrudPage';
+import type { ColumnDef, FieldDef } from '../Common/CrudPage';
 import { mastersApi } from '../../Services/masters.api';
 import type { Pincode } from '../../Services/masters.api';
 import { useAreaOptions } from './useCityOptions';
@@ -113,10 +113,6 @@ const BulkModal = ({
                 value={codes}
                 onChange={(e) => setCodes(e.target.value)}
               />
-              <span className='f-light f-12'>
-                One per line, or separated by commas or spaces. Codes already
-                mapped to the area are skipped and reported back.
-              </span>
             </div>
             <Btn attrBtn={{ color: 'primary', type: 'submit', disabled: saving }}>
               {saving ? 'Adding…' : 'Add'}
@@ -163,7 +159,6 @@ const Pincodes = () => {
     <CrudPage<Pincode>
       title='Pincodes'
       singular='Pincode'
-      description='Pincode to service-area mapping. This is what decides whether an address falls inside a serviceable zone.'
       columns={columns}
       fields={fields}
       load={load}

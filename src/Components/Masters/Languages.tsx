@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
-import StatusBadge from './StatusBadge';
-import CrudPage from './CrudPage';
-import type { ColumnDef, FieldDef } from './CrudPage';
+import StatusBadge from '../Common/StatusBadge';
+import CrudPage from '../Common/CrudPage';
+import type { ColumnDef, FieldDef } from '../Common/CrudPage';
 import { mastersApi } from '../../Services/masters.api';
 import type { Language } from '../../Services/masters.api';
 
@@ -36,14 +36,12 @@ const fields: FieldDef<Language>[] = [
     required: true,
     createOnly: true,
     placeholder: 'hi',
-    help: 'A language code such as en, hi, mr or en-IN. Letters only.',
   },
   { name: 'name', label: 'Name', required: true, placeholder: 'Hindi' },
   {
     name: 'isDefault',
     label: 'Make default',
     type: 'checkbox',
-    help: 'Promoting a language clears the previous default.',
   },
   { name: 'isActive', label: 'Active', type: 'checkbox', defaultValue: true },
 ];
@@ -59,7 +57,6 @@ const Languages = () => {
     <CrudPage<Language>
       title='Languages'
       singular='Language'
-      description='Languages offered across the app, SMS and email templates. Exactly one is the default, and it cannot be retired until another takes over.'
       columns={columns}
       fields={fields}
       load={load}

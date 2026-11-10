@@ -64,7 +64,7 @@ const AppLayout = () => {
               <CSSTransition
                 key={location.key}
                 nodeRef={nodeRef}
-                timeout={100}
+                timeout={400}
                 classNames={animationTheme}
                 unmountOnExit>
                 <div ref={nodeRef}>
