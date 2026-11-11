@@ -44,8 +44,109 @@ export const MENUITEMS: MenuGroup[] = [
     ],
   },
   {
+    // The two people-facing tables (spec 5.2, 5.3). Both are read-and-decide
+    // screens rather than CRUD: neither API has a create or a delete route,
+    // because a customer signs themselves up and a teacher applies.
+    menutitle: 'Management',
+    menucontent: 'Customers and teachers',
+    Items: [
+      {
+        title: 'Customers',
+        // `contact`, not `user`: Administration already uses `user`, and two
+        // groups on the same glyph is how people click the wrong one.
+        icon: 'contact',
+        type: 'link',
+        path: '/management/customers',
+        active: false,
+      },
+      {
+        title: 'Bookings',
+        icon: 'calendar',
+        type: 'link',
+        path: '/management/bookings',
+        active: false,
+      },
+      {
+        title: 'Transactions',
+        icon: 'charts',
+        type: 'link',
+        path: '/management/payments',
+        active: false,
+      },
+      {
+        // Two menus, not one table with a direction column: a customer's
+        // review of a provider is public once published, while a provider's
+        // review of a customer is internal and carries an admin-only note.
+        title: 'Reviews',
+        icon: 'social',
+        type: 'sub',
+        active: false,
+        children: [
+          {
+            path: '/reviews/customer',
+            title: 'Customer Reviews',
+            type: 'link',
+            active: false,
+          },
+          {
+            path: '/reviews/instructor',
+            title: 'Instructor Reviews',
+            type: 'link',
+            active: false,
+          },
+        ],
+      },
+      {
+        title: 'Instructors',
+        icon: 'learning',
+        type: 'link',
+        path: '/management/instructors',
+        active: false,
+      },
+    ],
+  },
+  {
+    // PDF 6.8 Commission and Earnings Information. Read-and-hold only: 6.8
+    // excludes automated settlements and split payments, so nothing here
+    // moves money.
+    menutitle: 'Finance',
+    menucontent: 'Instructor earnings and commission',
+    Items: [
+      {
+        title: 'Earnings',
+        icon: 'charts',
+        type: 'link',
+        path: '/finance/earnings',
+        active: false,
+      },
+    ],
+  },
+  {
+    // PDF 6.5 Category and Service Management. Asymmetric on purpose:
+    // categories are the admin's to create and edit, services are only
+    // reviewed and shown/hidden — 4.5 gives the instructor their own pricing.
+    menutitle: 'Catalog',
+    menucontent: 'Categories and instructor services',
+    Items: [
+      {
+        title: 'Categories',
+        icon: 'ecommerce',
+        type: 'link',
+        path: '/catalog/categories',
+        active: false,
+      },
+      {
+        title: 'Services',
+        icon: 'ui-kits',
+        type: 'link',
+        path: '/catalog/services',
+        active: false,
+      },
+    ],
+  },
+  {
     menutitle: 'Configuration',
-    menucontent: 'Geography, languages and holidays',
+    menucontent: 'Geography and holidays',
     Items: [
       {
         title: 'Masters',
@@ -57,7 +158,12 @@ export const MENUITEMS: MenuGroup[] = [
           { path: '/masters/areas', title: 'Service Areas', type: 'link', active: false },
           { path: '/masters/pincodes', title: 'Pincodes', type: 'link', active: false },
           { path: '/masters/branches', title: 'Branches', type: 'link', active: false },
-          { path: '/masters/languages', title: 'Languages', type: 'link', active: false },
+          // Commented out, not deleted — client instruction, 10 Nov 2026. The
+          // v3 PDF never mentions language (0 hits in 1,490 lines); the
+          // Languages master came from the ODT, which is no longer the source
+          // of truth. The screen, the API and the `languages` table all still
+          // exist; only the way in is closed.
+          // { path: '/masters/languages', title: 'Languages', type: 'link', active: false },
           { path: '/masters/holidays', title: 'Holidays', type: 'link', active: false },
         ],
       },

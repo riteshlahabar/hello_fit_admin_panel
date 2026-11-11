@@ -89,6 +89,17 @@ $hf-table-gutter: 30px;
     --bs-table-bg: #{$body-color};
     background-color: $body-color;
     color: $theme-body-font-color;
+    // 500 — client instruction, 10 Nov 2026, after 600 read as too heavy and
+    // 400 as too faint.
+    //
+    // This only became a real option once Rubik was actually loaded
+    // (`index.html`). Cuba's CSS asks for Rubik in 11 places but the archive
+    // never shipped a way to fetch it, so the panel fell back to the system
+    // `sans-serif` — Segoe UI on Windows, which has 300/400/600/700 and **no
+    // 500**. Every `font-weight: 500` in Cuba's stylesheets (80 of them) was
+    // silently rendering as 400, which is why 500 looked identical to 400 and
+    // 600 jumped straight to semibold. With Rubik loaded, 500 is a real face.
+    font-weight: 500;
   }
 }
 

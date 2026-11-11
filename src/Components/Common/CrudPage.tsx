@@ -91,12 +91,23 @@ export interface CrudPageProps<T extends { id: string }> {
     page?: number;
     includeInactive?: boolean;
   }) => Promise<{ ok: true; value: Listed<T> } | { ok: false; message: string }>;
-  create: (body: Record<string, unknown>) => Promise<{ ok: boolean; error?: { message: string } }>;
-  update: (
+  /** Omitted where the API has no create route — see `canCreate`. */
+  create?: (body: Record<string, unknown>) => Promise<{ ok: boolean; error?: { message: string } }>;
+  /**
+   * Omitted where the API has no update route — the Edit button goes with it.
+   * Bookings is the case: PDF 6.6 gives the administrator status *actions*,
+   * not a form over the booking's fields.
+   */
+  update?: (
     id: string,
     body: Record<string, unknown>,
   ) => Promise<{ ok: boolean; error?: { message: string } }>;
-  remove: (
+  /**
+   * Omitted where the API has no delete route. Customers are removed through
+   * the data-deletion request (spec 10.3) and teachers are blacklisted rather
+   * than deleted, so neither screen passes one.
+   */
+  remove?: (
     id: string,
   ) => Promise<{ ok: boolean; error?: { message: string } }>;
   /** Wording for the delete confirmation and the retire button. */
@@ -115,6 +126,13 @@ export interface CrudPageProps<T extends { id: string }> {
    * size it to the buttons the screen renders so the last one lands on the
    * 30px gutter. */
   actionsWidth?: string;
+  /**
+   * Hide the Add button. Customers and instructors both create their own
+   * records — by OTP signup and by applying from the app — so there is no
+   * create route to put behind it, and an Add button that cannot work is
+   * worse than no button.
+   */
+  canCreate?: boolean;
   /** Hide the delete button per row — a built-in role cannot be deleted. */
   canDelete?: (row: T) => boolean;
   /**
@@ -169,6 +187,7 @@ const CrudPage = <T extends { id: string }>({
   inactiveLabel = 'Show retired',
   hasSearch = true,
   actionsWidth = '225px',
+  canCreate = true,
   canDelete,
   rowActions,
 }: CrudPageProps<T>) => {
@@ -241,9 +260,16 @@ const CrudPage = <T extends { id: string }>({
       else body[f.name] = value;
     }
 
+    // `create` is absent on the screens whose API has no create route, and
+    // `canCreate` already hid the only button that opens the dialog that way.
+    if ((!editing && !create) || (editing && !update)) {
+      setSaving(false);
+      return;
+    }
+
     const result = editing
-      ? await update(editing.id, body)
-      : await create(body);
+      ? await update!(editing.id, body)
+      : await create!(body);
     setSaving(false);
 
     if (result.ok) {
@@ -256,6 +282,7 @@ const CrudPage = <T extends { id: string }>({
   };
 
   const onDelete = async (row: T) => {
+    if (!remove) return;
     const label =
       (row as unknown as Record<string, unknown>).name ??
       (row as unknown as Record<string, unknown>).title ??
@@ -334,14 +361,16 @@ const CrudPage = <T extends { id: string }>({
                           </Label>
                         </div>
                       ) : null}
-                      <Btn
-                        attrBtn={{
-                          color: 'primary',
-                          size: 'sm',
-                          onClick: openAdd,
-                        }}>
-                        {`Add ${singular}`}
-                      </Btn>
+                      {canCreate ? (
+                        <Btn
+                          attrBtn={{
+                            color: 'primary',
+                            size: 'sm',
+                            onClick: openAdd,
+                          }}>
+                          {`Add ${singular}`}
+                        </Btn>
+                      ) : null}
                     </div>
                   </Col>
                 </Row>
@@ -387,15 +416,17 @@ const CrudPage = <T extends { id: string }>({
                           <td>
                             <div className='d-flex gap-2 justify-content-center'>
                               {rowActions?.(row, () => void refresh())}
-                              <Btn
-                                attrBtn={{
-                                  color: 'light',
-                                  size: 'sm',
-                                  onClick: () => openEdit(row),
-                                }}>
-                                Edit
-                              </Btn>
-                              {!canDelete || canDelete(row) ? (
+                              {update ? (
+                                <Btn
+                                  attrBtn={{
+                                    color: 'light',
+                                    size: 'sm',
+                                    onClick: () => openEdit(row),
+                                  }}>
+                                  Edit
+                                </Btn>
+                              ) : null}
+                              {remove && (!canDelete || canDelete(row)) ? (
                                 <Btn
                                   attrBtn={{
                                     color: 'danger',

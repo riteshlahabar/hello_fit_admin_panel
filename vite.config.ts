@@ -41,9 +41,14 @@ export default defineConfig({
     // a dev proxy and stays same-origin. Production serves both behind one
     // origin, or the backend grows an allow-list -- a deployment decision,
     // not something to enable blindly.
+    //
+    // The target is overridable with `API_PROXY_TARGET` so a second dev server
+    // can be pointed at a second API instance -- useful when one is already
+    // running on 3000 and you need to try a build of the API against the panel
+    // without stopping it. Default unchanged.
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: process.env.API_PROXY_TARGET ?? 'http://localhost:3000',
         changeOrigin: true,
       },
     },

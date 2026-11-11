@@ -19,6 +19,15 @@ import Languages from '../Components/Masters/Languages';
 import Holidays from '../Components/Masters/Holidays';
 import AdminUsers from '../Components/Administration/AdminUsers';
 import Roles from '../Components/Administration/Roles';
+import Customers from '../Components/Customers/Customers';
+import Instructors from '../Components/Instructors/Instructors';
+import Bookings from '../Components/Bookings/Bookings';
+import CustomerReviews from '../Components/Reviews/CustomerReviews';
+import InstructorReviews from '../Components/Reviews/InstructorReviews';
+import Payments from '../Components/Payments/Payments';
+import Earnings from '../Components/Earnings/Earnings';
+import Categories from '../Components/Catalog/Categories';
+import Services from '../Components/Catalog/Services';
 
 export interface AppRoute {
   path: string;
@@ -28,11 +37,34 @@ export interface AppRoute {
 export const routes: AppRoute[] = [
   { path: `/dashboard/:layout`, Component: <Dashboard /> },
 
-  // Masters (spec 5.7) — backed by /admin/masters/* on the API.
+  // Management (spec 5.2, 5.3) — /admin/customers/* and /admin/instructors/*.
+  // Neither has a create or a delete route: a customer signs themselves up and
+  // a teacher applies from the app.
+  { path: `/management/customers/:layout`, Component: <Customers /> },
+  { path: `/management/instructors/:layout`, Component: <Instructors /> },
+  // Bookings — PDF 6.6 Booking Management.
+  { path: `/management/bookings/:layout`, Component: <Bookings /> },
+  // Transactions — PDF 6.7 Payment and Transaction Management (read-only).
+  { path: `/management/payments/:layout`, Component: <Payments /> },
+  // Reviews — PDF 6.10. Split by direction: the customer's review of a
+  // provider is public, the provider's review of a customer is internal.
+  { path: `/reviews/customer/:layout`, Component: <CustomerReviews /> },
+  { path: `/reviews/instructor/:layout`, Component: <InstructorReviews /> },
+
+  // Earnings — PDF 6.8 Commission and Earnings Information.
+  { path: `/finance/earnings/:layout`, Component: <Earnings /> },
+
+  // Catalog — PDF 6.5 Category and Service Management.
+  { path: `/catalog/categories/:layout`, Component: <Categories /> },
+  { path: `/catalog/services/:layout`, Component: <Services /> },
+
+  // Masters — NOT in the PDF, see state/scope-documents.md.
   { path: `/masters/cities/:layout`, Component: <Cities /> },
   { path: `/masters/areas/:layout`, Component: <Areas /> },
   { path: `/masters/pincodes/:layout`, Component: <Pincodes /> },
   { path: `/masters/branches/:layout`, Component: <Branches /> },
+  // Languages — menu commented out 10 Nov 2026 (not in the v3 PDF). Route left
+  // in place so the screen still resolves if the menu entry comes back.
   { path: `/masters/languages/:layout`, Component: <Languages /> },
   { path: `/masters/holidays/:layout`, Component: <Holidays /> },
 

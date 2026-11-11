@@ -4,6 +4,30 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!--
+      Rubik. Cuba's stylesheets ask for it in 11 places (`font-family: Rubik,
+      sans-serif`) but the archive never shipped a way to load it — no link,
+      no @font-face — so until now the panel rendered in the system
+      `sans-serif`. On Windows that is Segoe UI, which has 300/400/600/700 and
+      **no 500**: every `font-weight: 500` in Cuba's CSS (80 of them) was
+      silently rendering as 400, and 600 jumped straight to semibold with
+      nothing in between.
+
+      Preconnect to both hosts: the stylesheet comes from fonts.googleapis.com
+      and the font files it names come from fonts.gstatic.com, so without the
+      second one the font fetch waits on a fresh connection.
+
+      `display=swap` so text paints in the fallback immediately rather than
+      leaving the panel blank while the font downloads.
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
     <title>hellofit_admin_panel</title>
   </head>
   <body>
