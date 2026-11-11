@@ -28,6 +28,21 @@ const columns: ColumnDef<Category>[] = [
     ),
   },
   { header: 'Description', cell: (r) => r.description ?? '—' },
+  {
+    header: 'Image',
+    // The thumbnail is the only honest check that a pasted URL resolves —
+    // a broken link looks fine as text.
+    cell: (r) =>
+      r.imageUrl ? (
+        <img
+          src={r.imageUrl}
+          alt={`${r.name} card`}
+          style={{ width: 56, height: 36, objectFit: 'cover', borderRadius: 6 }}
+        />
+      ) : (
+        '—'
+      ),
+  },
   { header: 'Services', cell: (r) => r._count?.services ?? 0 },
   { header: 'Sort', cell: (r) => r.sortOrder },
   {
@@ -43,6 +58,13 @@ const columns: ColumnDef<Category>[] = [
 const fields: FieldDef<Category>[] = [
   { name: 'name', label: 'Name', required: true },
   { name: 'sortOrder', label: 'Sort order', type: 'number', defaultValue: 0 },
+  {
+    name: 'imageUrl',
+    label: 'Card image URL',
+    wide: true,
+    placeholder: 'https://…',
+    help: 'Shown on the website home grid. Leave empty and the card falls back to the built-in image.',
+  },
   {
     name: 'description',
     label: 'Description',

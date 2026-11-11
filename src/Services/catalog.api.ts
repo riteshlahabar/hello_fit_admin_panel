@@ -20,6 +20,8 @@ export interface Category {
   slug: string;
   description: string | null;
   icon: string | null;
+  /** Card image for the website home grid (PDF 6.5, client instruction 11 Nov). */
+  imageUrl: string | null;
   sortOrder: number;
   isActive: boolean;
   _count?: { services: number };
