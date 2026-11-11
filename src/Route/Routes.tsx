@@ -29,6 +29,12 @@ import Earnings from '../Components/Earnings/Earnings';
 import Categories from '../Components/Catalog/Categories';
 import Services from '../Components/Catalog/Services';
 import Coupons from '../Components/Marketing/Coupons';
+import {
+  AccountsReportPage,
+  BookingsReportPage,
+  PaymentsReportPage,
+  StatusReportPage,
+} from '../Components/Reports';
 
 export interface AppRoute {
   path: string;
@@ -61,6 +67,13 @@ export const routes: AppRoute[] = [
 
   // Marketing — PDF 6.9 Coupons and Promotional Settings.
   { path: `/marketing/coupons/:layout`, Component: <Coupons /> },
+
+  // Reports — PDF 6.12. One route per report, no export (6.12 gates it) and
+  // no Summary page (charts are not in the PDF — parked for the client).
+  { path: `/reports/bookings/:layout`, Component: <BookingsReportPage /> },
+  { path: `/reports/customers-providers/:layout`, Component: <AccountsReportPage /> },
+  { path: `/reports/payments/:layout`, Component: <PaymentsReportPage /> },
+  { path: `/reports/booking-status/:layout`, Component: <StatusReportPage /> },
 
   // Masters — NOT in the PDF, see state/scope-documents.md.
   { path: `/masters/cities/:layout`, Component: <Cities /> },

@@ -34,8 +34,12 @@ $hf-table-gutter: 30px;
   // what remains, equally.
   table-layout: fixed;
 
+  // `tfoot` is here for the reports screens' total rows — CrudPage has no
+  // footer. Without it a totals row would keep Cuba's 12px and sit out of
+  // line with the body it totals.
   > thead > tr,
-  > tbody > tr {
+  > tbody > tr,
+  > tfoot > tr {
     // Outer edge only — the gutter between columns stays Cuba's 0.75rem.
     > :first-child {
       padding-inline-start: $hf-table-gutter;
@@ -115,6 +119,13 @@ body.dark-only .hf-crud-table > thead > tr > th {
 // vertical padding stays at Bootstrap's `p-3` value so the row keeps its
 // height.
 .hf-crud-foot {
+  padding: 16px $hf-table-gutter;
+}
+
+// The reports screens' From/To range card. Same treatment and the same reason:
+// on Bootstrap's `p-3` its inputs sat 16px in while the table below them
+// started at 30px, so the two cards did not share a left edge.
+.hf-report-filters {
   padding: 16px $hf-table-gutter;
 }
 

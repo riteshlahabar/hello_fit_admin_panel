@@ -145,6 +145,38 @@ export const MENUITEMS: MenuGroup[] = [
     ],
   },
   {
+    // PDF 6.12 Reports. One item per report — client instruction,
+    // 11 Nov 2026. No Summary item: "all reports in cards and graphs" is the
+    // Dashboard (6.2) with a range instead of a day, and charts are nowhere in
+    // the PDF, so it is parked pending the client.
+    menutitle: 'Reports',
+    menucontent: 'Operational summaries',
+    Items: [
+      {
+        title: 'Reports',
+        icon: 'charts',
+        type: 'sub',
+        active: false,
+        children: [
+          { path: '/reports/bookings', title: 'Bookings', type: 'link', active: false },
+          {
+            path: '/reports/customers-providers',
+            title: 'Customers & Providers',
+            type: 'link',
+            active: false,
+          },
+          { path: '/reports/payments', title: 'Payments', type: 'link', active: false },
+          {
+            path: '/reports/booking-status',
+            title: 'Booking Status',
+            type: 'link',
+            active: false,
+          },
+        ],
+      },
+    ],
+  },
+  {
     // PDF 6.9 Coupons and Promotional Settings. One item, because 6.9 asks
     // for one thing — promotional codes. 6.11 Content Management is the other
     // marketing-shaped menu in the PDF and is not built yet.
