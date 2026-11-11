@@ -28,6 +28,7 @@ import Payments from '../Components/Payments/Payments';
 import Earnings from '../Components/Earnings/Earnings';
 import Categories from '../Components/Catalog/Categories';
 import Services from '../Components/Catalog/Services';
+import Coupons from '../Components/Marketing/Coupons';
 
 export interface AppRoute {
   path: string;
@@ -57,6 +58,9 @@ export const routes: AppRoute[] = [
   // Catalog — PDF 6.5 Category and Service Management.
   { path: `/catalog/categories/:layout`, Component: <Categories /> },
   { path: `/catalog/services/:layout`, Component: <Services /> },
+
+  // Marketing — PDF 6.9 Coupons and Promotional Settings.
+  { path: `/marketing/coupons/:layout`, Component: <Coupons /> },
 
   // Masters — NOT in the PDF, see state/scope-documents.md.
   { path: `/masters/cities/:layout`, Component: <Cities /> },

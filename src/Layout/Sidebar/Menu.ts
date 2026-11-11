@@ -145,6 +145,22 @@ export const MENUITEMS: MenuGroup[] = [
     ],
   },
   {
+    // PDF 6.9 Coupons and Promotional Settings. One item, because 6.9 asks
+    // for one thing — promotional codes. 6.11 Content Management is the other
+    // marketing-shaped menu in the PDF and is not built yet.
+    menutitle: 'Marketing',
+    menucontent: 'Promotional coupons',
+    Items: [
+      {
+        title: 'Coupons',
+        icon: 'charts',
+        type: 'link',
+        path: '/marketing/coupons',
+        active: false,
+      },
+    ],
+  },
+  {
     menutitle: 'Configuration',
     menucontent: 'Geography and holidays',
     Items: [

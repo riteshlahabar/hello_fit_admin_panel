@@ -487,7 +487,7 @@ const CrudPage = <T extends { id: string }>({
             aria-label='Close'
           />
         </div>
-        <ModalBody>
+        <ModalBody style={{ padding: '24px' }}>
           <Form className='needs-validation' onSubmit={onSubmit}>
             <div className='form-row row'>
               {fields
