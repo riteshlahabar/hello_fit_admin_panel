@@ -62,7 +62,7 @@ const columns: ColumnDef<PaymentRow>[] = [
       </div>
     ),
   },
-  { header: 'Instructor', cell: (r) => providerOf(r) },
+  { header: 'Trainer', cell: (r) => providerOf(r) },
   { header: 'Amount', cell: (r) => `₹${Number(r.amount).toFixed(2)}` },
   { header: 'Method', cell: (r) => r.method ?? '—' },
   {
@@ -162,7 +162,7 @@ const ViewModal = ({ payment }: { payment: PaymentRow }) => {
                     <td>{payment.booking?.customer?.name ?? '—'}</td>
                   </tr>
                   <tr>
-                    <th scope='row'>Instructor</th>
+                    <th scope='row'>Trainer</th>
                     <td>{providerOf(payment)}</td>
                   </tr>
                   <tr>

@@ -24,7 +24,7 @@ const AccountsReport = ({ range }: { range: RangeQuery }) => {
         { label: '— suspended', value: data.customers.suspended },
         { label: '— blocked', value: data.customers.blocked },
         {
-          label: 'Providers',
+          label: 'Trainers',
           value: data.providers.total,
           inRange: data.providers.newApplicationsInRange,
         },
@@ -40,7 +40,7 @@ const AccountsReport = ({ range }: { range: RangeQuery }) => {
 
   return (
     <ReportTable
-      title='Customers and providers'
+      title='Customers and trainers'
       subtitle={data ? `New accounts counted ${data.range.from} to ${data.range.to}` : undefined}
       headers={['Metric', 'Total now', 'New in range']}
       loading={loading}

@@ -36,6 +36,9 @@ export type InstructorStatus = 'ACTIVE' | 'SUSPENDED' | 'BLACKLISTED';
 
 export type DutyStatus = 'ON_DUTY' | 'OFF_DUTY';
 
+/** Where a provider will hold a session. Drives PDF 5.5's website filter. */
+export type SessionFormat = 'CUSTOMER_HOME' | 'PROVIDER_LOCATION' | 'ONLINE';
+
 export type VerifyStatus = 'PENDING' | 'VERIFIED' | 'REJECTED';
 
 export interface Instructor {
@@ -46,6 +49,7 @@ export interface Instructor {
   experienceYears: number;
   languages: string[];
   specialisations: string[];
+  sessionFormats: SessionFormat[];
   branchId: string | null;
   dailySessionCap: number;
   travelBufferMin: number;
@@ -76,7 +80,33 @@ export interface InstructorDocument {
   createdAt: string;
 }
 
+/**
+ * One service this provider offers (PDF 6.5, "review provider service
+ * information").
+ *
+ * `approvedAt` is the switch that puts them on the public website:
+ * `provider-visibility.ts` requires at least one approved, active offering
+ * before a provider appears in Find a Trainer at all.
+ */
+export interface InstructorOffering {
+  id: string;
+  level: string;
+  customPrice: string | null;
+  isActive: boolean;
+  approvedAt: string | null;
+  createdAt: string;
+  service: {
+    id: string;
+    name: string;
+    basePrice: string;
+    durationMin: number;
+    isActive: boolean;
+    category: { id: string; name: string } | null;
+  };
+}
+
 export interface InstructorDetail extends Instructor {
+  offerings: InstructorOffering[];
   documents: InstructorDocument[];
   /** Why `APPROVED` is or is not available, straight from the calculator. */
   approval: { ok: boolean; reasons: string[] };
@@ -128,6 +158,18 @@ export const instructorsApi = {
   update: (id: string, body: Record<string, unknown>) =>
     api.patch<Instructor>(`${BASE}/${id}`, body),
 
+  /**
+   * `instructors:approve`. Publish or unpublish one offering (PDF 6.5).
+   *
+   * Refused when the service is inactive or the provider's KYC is unverified —
+   * approving into either would publish something nobody can book. The refusal
+   * says which, so the screen can show it.
+   */
+  setOfferingApproval: (id: string, serviceId: string, approved: boolean) =>
+    api.post<InstructorOffering>(`${BASE}/${id}/services/${serviceId}/approval`, {
+      approved,
+    }),
+
   /** `instructors:approve`. Reports how many sessions need reassigning. */
   changeStatus: (
     id: string,
@@ -147,4 +189,11 @@ export const ONBOARDING_STAGES: { value: OnboardingStage; label: string }[] = [
   { value: 'DEMO_SESSION', label: 'Demo session' },
   { value: 'APPROVED', label: 'Approved' },
   { value: 'REJECTED', label: 'Rejected' },
+];
+
+/** The three session formats, for the provider detail editor. */
+export const SESSION_FORMATS: { value: SessionFormat; label: string }[] = [
+  { value: 'CUSTOMER_HOME', label: "At the customer's home" },
+  { value: 'PROVIDER_LOCATION', label: "At the provider's location" },
+  { value: 'ONLINE', label: 'Online' },
 ];

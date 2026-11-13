@@ -48,7 +48,7 @@ export const MENUITEMS: MenuGroup[] = [
     // screens rather than CRUD: neither API has a create or a delete route,
     // because a customer signs themselves up and a teacher applies.
     menutitle: 'Management',
-    menucontent: 'Customers and teachers',
+    menucontent: 'Customers and trainers',
     Items: [
       {
         title: 'Customers',
@@ -90,14 +90,14 @@ export const MENUITEMS: MenuGroup[] = [
           },
           {
             path: '/reviews/instructor',
-            title: 'Instructor Reviews',
+            title: 'Trainer Reviews',
             type: 'link',
             active: false,
           },
         ],
       },
       {
-        title: 'Instructors',
+        title: 'Trainers',
         icon: 'learning',
         type: 'link',
         path: '/management/instructors',
@@ -110,7 +110,7 @@ export const MENUITEMS: MenuGroup[] = [
     // excludes automated settlements and split payments, so nothing here
     // moves money.
     menutitle: 'Finance',
-    menucontent: 'Instructor earnings and commission',
+    menucontent: 'Trainer earnings and commission',
     Items: [
       {
         title: 'Earnings',
@@ -126,7 +126,7 @@ export const MENUITEMS: MenuGroup[] = [
     // categories are the admin's to create and edit, services are only
     // reviewed and shown/hidden — 4.5 gives the instructor their own pricing.
     menutitle: 'Catalog',
-    menucontent: 'Categories and instructor services',
+    menucontent: 'Categories and trainer services',
     Items: [
       {
         title: 'Categories',
@@ -161,7 +161,7 @@ export const MENUITEMS: MenuGroup[] = [
           { path: '/reports/bookings', title: 'Bookings', type: 'link', active: false },
           {
             path: '/reports/customers-providers',
-            title: 'Customers & Providers',
+            title: 'Customers & Trainers',
             type: 'link',
             active: false,
           },

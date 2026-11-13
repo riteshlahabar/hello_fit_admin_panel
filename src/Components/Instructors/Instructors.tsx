@@ -28,6 +28,7 @@ import { Button, Form, Input, Label, Modal, ModalBody } from 'reactstrap';
 import { toast } from 'react-toastify';
 import { Btn, H5 } from '../../AbstractElements';
 import StatusBadge from '../Common/StatusBadge';
+import OfferingsModal from './OfferingsModal';
 import CrudPage from '../Common/CrudPage';
 import type { BadgeTone } from '../Common/StatusBadge';
 import type { ColumnDef, FieldDef } from '../Common/CrudPage';
@@ -404,8 +405,8 @@ const Instructors = () => {
 
   return (
     <CrudPage<Instructor>
-      title='Instructors'
-      singular='Instructor'
+      title='Trainers'
+      singular='Trainer'
       parent='Management'
       columns={columns}
       fields={fields}
@@ -413,10 +414,13 @@ const Instructors = () => {
       update={instructorsApi.update}
       canCreate={false}
       hasActiveFlag={false}
-      actionsWidth='360px'
+      actionsWidth='460px'
       rowActions={(row, refresh) => (
         <Fragment>
           <DocumentsModal instructor={row} />
+          {/* PDF 6.5. Publishing a service here is what makes a provider
+              visible on the website at all — see OfferingsModal. */}
+          <OfferingsModal instructor={row} />
           <StageModal instructor={row} onDone={refresh} />
         </Fragment>
       )}

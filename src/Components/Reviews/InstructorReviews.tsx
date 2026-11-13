@@ -8,7 +8,7 @@
 import ReviewsPage from './ReviewsPage';
 
 const InstructorReviews = () => (
-  <ReviewsPage title='Instructor Reviews' direction='INSTRUCTOR_TO_CUSTOMER' />
+  <ReviewsPage title='Trainer Reviews' direction='INSTRUCTOR_TO_CUSTOMER' />
 );
 
 export default InstructorReviews;

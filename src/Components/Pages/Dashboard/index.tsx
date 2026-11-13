@@ -168,7 +168,7 @@ const Dashboard = () => {
           </Col>
           <Col xl='3' sm='6' className='box-col-6'>
             <Tile
-              title='Total instructors'
+              title='Total trainers'
               total={dash(instructors?.total)}
               hint={
                 instructors

@@ -83,7 +83,7 @@ const columns: ColumnDef<Booking>[] = [
     ),
   },
   {
-    header: 'Provider',
+    header: 'Trainer',
     cell: (r) => firstSession(r)?.instructor?.name ?? 'Unassigned',
   },
   { header: 'Service', cell: (r) => r.service?.name ?? '—' },
@@ -183,7 +183,7 @@ const ViewModal = ({ booking }: { booking: Booking }) => {
                     <th scope='col'>#</th>
                     <th scope='col'>Date</th>
                     <th scope='col'>Time</th>
-                    <th scope='col'>Provider</th>
+                    <th scope='col'>Trainer</th>
                     <th scope='col'>Status</th>
                   </tr>
                 </thead>

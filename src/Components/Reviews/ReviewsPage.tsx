@@ -65,10 +65,10 @@ const columnsFor = (direction: ReviewDirection): ColumnDef<Review>[] => [
   ...(direction === 'CUSTOMER_TO_INSTRUCTOR'
     ? [
         { header: 'Customer', cell: (r: Review) => r.customerName ?? '—' },
-        { header: 'Instructor', cell: (r: Review) => r.instructorName ?? '—' },
+        { header: 'Trainer', cell: (r: Review) => r.instructorName ?? '—' },
       ]
     : [
-        { header: 'Instructor', cell: (r: Review) => r.instructorName ?? '—' },
+        { header: 'Trainer', cell: (r: Review) => r.instructorName ?? '—' },
         { header: 'Customer', cell: (r: Review) => r.customerName ?? '—' },
       ]),
   {
@@ -182,7 +182,7 @@ const ModerateModal = ({
                 <td>{review.customerName ?? '—'}</td>
               </tr>
               <tr>
-                <th scope='row'>Provider</th>
+                <th scope='row'>Trainer</th>
                 <td>{review.instructorName ?? '—'}</td>
               </tr>
               <tr>
@@ -216,7 +216,7 @@ const ModerateModal = ({
               ) : null}
               {review.reply ? (
                 <tr>
-                  <th scope='row'>Provider reply</th>
+                  <th scope='row'>Trainer reply</th>
                   <td>{review.reply}</td>
                 </tr>
               ) : null}

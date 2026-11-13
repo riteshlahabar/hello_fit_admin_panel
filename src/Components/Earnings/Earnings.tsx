@@ -60,7 +60,7 @@ const columns: ColumnDef<Earning>[] = [
       </div>
     ),
   },
-  { header: 'Instructor', cell: (r) => r.instructor?.name ?? '—' },
+  { header: 'Trainer', cell: (r) => r.instructor?.name ?? '—' },
   { header: 'Service', cell: (r) => r.session?.service?.name ?? '—' },
   { header: 'Session value', cell: (r) => money(r.sessionValue) },
   { header: 'Commission', cell: (r) => money(r.commissionAmount) },
@@ -277,8 +277,8 @@ const Earnings = () => {
             value={instructorId}
             onChange={(e) => setInstructorId(e.target.value)}
             className='hf-filter-control'
-            aria-label='Filter by instructor'>
-            <option value=''>Any instructor</option>
+            aria-label='Filter by trainer'>
+            <option value=''>Any trainer</option>
             {instructors.map((i) => (
               <option key={i.value} value={i.value}>
                 {i.label}

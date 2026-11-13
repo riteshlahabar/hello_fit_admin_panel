@@ -25,7 +25,7 @@ export const BookingsReportPage = () => (
 
 export const AccountsReportPage = () => (
   <ReportPage
-    title='Customers and Providers'
+    title='Customers and Trainers'
     render={(range) => <AccountsReport range={range} />}
   />
 );

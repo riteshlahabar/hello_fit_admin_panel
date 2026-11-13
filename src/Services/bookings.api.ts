@@ -97,10 +97,10 @@ export const STATUS_OPTIONS: { value: SessionStatus; label: string }[] = [
   { value: 'COMPLETED', label: 'Completed' },
   { value: 'RESCHEDULE_REQUESTED', label: 'Reschedule requested' },
   { value: 'CANCELLED_BY_CUSTOMER', label: 'Cancelled by customer' },
-  { value: 'CANCELLED_BY_TEACHER', label: 'Cancelled by provider' },
+  { value: 'CANCELLED_BY_TEACHER', label: 'Cancelled by trainer' },
   { value: 'CANCELLED_BY_ADMIN', label: 'Cancelled by admin' },
   { value: 'NO_SHOW_CUSTOMER', label: 'No-show — customer' },
-  { value: 'NO_SHOW_TEACHER', label: 'No-show — provider' },
+  { value: 'NO_SHOW_TEACHER', label: 'No-show — trainer' },
 ];
 
 export const PAYMENT_OPTIONS: { value: PaymentStatus; label: string }[] = [

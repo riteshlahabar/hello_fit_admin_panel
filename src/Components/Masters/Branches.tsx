@@ -11,7 +11,7 @@ const columns: ColumnDef<Branch>[] = [
   { header: 'City', cell: (r) => r.city?.name ?? '—' },
   { header: 'Manager', cell: (r) => r.manager?.name ?? '—' },
   { header: 'Areas', cell: (r) => r._count?.serviceAreas ?? 0 },
-  { header: 'Teachers', cell: (r) => r._count?.instructors ?? 0 },
+  { header: 'Trainers', cell: (r) => r._count?.instructors ?? 0 },
   {
     header: 'Status',
     cell: (r) => (
