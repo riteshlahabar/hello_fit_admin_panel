@@ -29,6 +29,7 @@ import Earnings from '../Components/Earnings/Earnings';
 import Categories from '../Components/Catalog/Categories';
 import Services from '../Components/Catalog/Services';
 import Coupons from '../Components/Marketing/Coupons';
+import Plans from '../Components/Plans/Plans';
 import {
   AccountsReportPage,
   BookingsReportPage,
@@ -67,6 +68,8 @@ export const routes: AppRoute[] = [
 
   // Marketing — PDF 6.9 Coupons and Promotional Settings.
   { path: `/marketing/coupons/:layout`, Component: <Coupons /> },
+  // Membership plans — client instruction, 13 Nov 2026 (not in the v3 PDF).
+  { path: `/marketing/plans/:layout`, Component: <Plans /> },
 
   // Reports — PDF 6.12. One route per report, no export (6.12 gates it) and
   // no Summary page (charts are not in the PDF — parked for the client).

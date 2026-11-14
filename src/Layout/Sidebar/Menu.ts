@@ -181,13 +181,24 @@ export const MENUITEMS: MenuGroup[] = [
     // for one thing — promotional codes. 6.11 Content Management is the other
     // marketing-shaped menu in the PDF and is not built yet.
     menutitle: 'Marketing',
-    menucontent: 'Promotional coupons',
+    menucontent: 'Coupons and membership plans',
     Items: [
       {
         title: 'Coupons',
         icon: 'charts',
         type: 'link',
         path: '/marketing/coupons',
+        active: false,
+      },
+      {
+        // Membership plans — client instruction, 13 Nov 2026.
+        // **Not in the v3 PDF**; see state/open-points.md. Sits under
+        // Marketing because, like coupons, it is something an administrator
+        // publishes to the public website.
+        title: 'Plans',
+        icon: 'charts',
+        type: 'link',
+        path: '/marketing/plans',
         active: false,
       },
     ],
