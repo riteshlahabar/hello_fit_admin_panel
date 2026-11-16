@@ -14,7 +14,6 @@ export interface CustomizerContextValue {
   mixLayout: boolean;
   sidebarResponsive: boolean;
   IsOpen: boolean;
-  layoutURL: string;
   customizer: ThemeConfigData;
   setIsClose: (open: boolean) => void;
   setToggleIcon: (toggle: boolean) => void;

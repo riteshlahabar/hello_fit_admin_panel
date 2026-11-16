@@ -31,8 +31,6 @@ import { Loading } from '../../Constant';
 import SvgIcon from '../../Components/Common/Component/SvgIcon';
 
 const Header = () => {
-  const id = window.location.pathname.split('/').pop();
-  const layout = id;
   const { toggleIcon } = useContext(CustomContext);
   const [searchValue, setsearchValue] = useState<string | MenuItem[]>('');
   const { customizer } = useContext(CustomContext);
@@ -152,7 +150,7 @@ const Header = () => {
                               <div className='ProfileCard-details'>
                                 <div className='ProfileCard-realName'>
                                   <Link
-                                    to={data.path + '/' + layout}
+                                    to={data.path ?? '#'}
                                     className='realname  w-100 d-flex justify-content-start gap-2'
                                     onClick={removeFix}>
                                     <SvgIcon

@@ -1,12 +1,11 @@
 // Ported from Cuba 4.8.26 -- src/CommonElements/Breadcrumbs/index.jsx.
 // Props arrive under Cuba's `attr*` convention; see ../index.ts.
 
-import { Fragment, useContext } from 'react';
+import { Fragment } from 'react';
 import type { ReactNode } from 'react';
 import { Container, Row, Col } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import H3 from '../Headings/H3Element';
-import CustomizerContext from '../../_helper/Customizer';
 import SvgIcon from '../../Components/Common/Component/SvgIcon';
 import { PUBLIC_URL } from '../../Config/base';
 
@@ -18,7 +17,6 @@ interface BreadcrumbsProps {
 }
 
 const Breadcrumbs = (props: BreadcrumbsProps) => {
-  const { layoutURL } = useContext(CustomizerContext);
   return (
     <Fragment>
       <Container fluid={true}>
@@ -30,7 +28,7 @@ const Breadcrumbs = (props: BreadcrumbsProps) => {
             <Col xs='6'>
               <ol className='breadcrumb'>
                 <li className='breadcrumb-item'>
-                  <Link to={`${PUBLIC_URL}/dashboard/${layoutURL}`}>
+                  <Link to={`${PUBLIC_URL}/dashboard`}>
                     <SvgIcon iconId='stroke-home' />
                   </Link>
                 </li>

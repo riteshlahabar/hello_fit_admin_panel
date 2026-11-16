@@ -4,10 +4,12 @@
 // full template ships several hundred. The list below grows one line per
 // screen as each is brought across from Cuba's template.
 //
-// The `:layout` segment is Cuba's, not decoration: SidebarMenuItems links to
-// `path + '/' + layoutId` and CustomizerProvider reads the layout name back out
-// of the URL's last segment, which is how Cuba's twelve layouts survive a
-// reload.
+// Cuba declares every path with a trailing `/:layout` segment -- the name of
+// one of its twelve sidebar layouts -- so its theme-customizer can switch
+// layout and have the choice survive a reload. That customizer is not ported
+// (see Layout/Layout.tsx), so the segment could never be anything but `Dubai`
+// and is gone from these paths. The layout class still comes from
+// CustomizerProvider, which falls back to Cuba's own default.
 
 import type { ReactNode } from 'react';
 import Dashboard from '../Components/Pages/Dashboard';
@@ -43,54 +45,54 @@ export interface AppRoute {
 }
 
 export const routes: AppRoute[] = [
-  { path: `/dashboard/:layout`, Component: <Dashboard /> },
+  { path: `/dashboard`, Component: <Dashboard /> },
 
   // Management (spec 5.2, 5.3) — /admin/customers/* and /admin/instructors/*.
   // Neither has a create or a delete route: a customer signs themselves up and
   // a teacher applies from the app.
-  { path: `/management/customers/:layout`, Component: <Customers /> },
-  { path: `/management/instructors/:layout`, Component: <Instructors /> },
+  { path: `/management/customers`, Component: <Customers /> },
+  { path: `/management/instructors`, Component: <Instructors /> },
   // Bookings — PDF 6.6 Booking Management.
-  { path: `/management/bookings/:layout`, Component: <Bookings /> },
+  { path: `/management/bookings`, Component: <Bookings /> },
   // Transactions — PDF 6.7 Payment and Transaction Management (read-only).
-  { path: `/management/payments/:layout`, Component: <Payments /> },
+  { path: `/management/payments`, Component: <Payments /> },
   // Reviews — PDF 6.10. Split by direction: the customer's review of a
   // provider is public, the provider's review of a customer is internal.
-  { path: `/reviews/customer/:layout`, Component: <CustomerReviews /> },
-  { path: `/reviews/instructor/:layout`, Component: <InstructorReviews /> },
+  { path: `/reviews/customer`, Component: <CustomerReviews /> },
+  { path: `/reviews/instructor`, Component: <InstructorReviews /> },
 
   // Earnings — PDF 6.8 Commission and Earnings Information.
-  { path: `/finance/earnings/:layout`, Component: <Earnings /> },
+  { path: `/finance/earnings`, Component: <Earnings /> },
 
   // Catalog — PDF 6.5 Category and Service Management.
-  { path: `/catalog/categories/:layout`, Component: <Categories /> },
-  { path: `/catalog/services/:layout`, Component: <Services /> },
+  { path: `/catalog/categories`, Component: <Categories /> },
+  { path: `/catalog/services`, Component: <Services /> },
 
   // Marketing — PDF 6.9 Coupons and Promotional Settings.
-  { path: `/marketing/coupons/:layout`, Component: <Coupons /> },
+  { path: `/marketing/coupons`, Component: <Coupons /> },
   // Membership plans — client instruction, 13 Nov 2026 (not in the v3 PDF).
-  { path: `/marketing/plans/:layout`, Component: <Plans /> },
+  { path: `/marketing/plans`, Component: <Plans /> },
 
   // Reports — PDF 6.12. One route per report, no export (6.12 gates it) and
   // no Summary page (charts are not in the PDF — parked for the client).
-  { path: `/reports/bookings/:layout`, Component: <BookingsReportPage /> },
-  { path: `/reports/customers-providers/:layout`, Component: <AccountsReportPage /> },
-  { path: `/reports/payments/:layout`, Component: <PaymentsReportPage /> },
-  { path: `/reports/booking-status/:layout`, Component: <StatusReportPage /> },
+  { path: `/reports/bookings`, Component: <BookingsReportPage /> },
+  { path: `/reports/customers-providers`, Component: <AccountsReportPage /> },
+  { path: `/reports/payments`, Component: <PaymentsReportPage /> },
+  { path: `/reports/booking-status`, Component: <StatusReportPage /> },
 
   // Masters — NOT in the PDF, see state/scope-documents.md.
-  { path: `/masters/cities/:layout`, Component: <Cities /> },
-  { path: `/masters/areas/:layout`, Component: <Areas /> },
-  { path: `/masters/pincodes/:layout`, Component: <Pincodes /> },
-  { path: `/masters/branches/:layout`, Component: <Branches /> },
+  { path: `/masters/cities`, Component: <Cities /> },
+  { path: `/masters/areas`, Component: <Areas /> },
+  { path: `/masters/pincodes`, Component: <Pincodes /> },
+  { path: `/masters/branches`, Component: <Branches /> },
   // Languages — menu commented out 10 Nov 2026 (not in the v3 PDF). Route left
   // in place so the screen still resolves if the menu entry comes back.
-  { path: `/masters/languages/:layout`, Component: <Languages /> },
-  { path: `/masters/holidays/:layout`, Component: <Holidays /> },
+  { path: `/masters/languages`, Component: <Languages /> },
+  { path: `/masters/holidays`, Component: <Holidays /> },
 
   // Administration (spec 5.8) — /admin/admin-users/* and /admin/roles/* on
   // the API. Both are Super Admin only by default: the seed grants the
   // `admins` permission module to that role alone.
-  { path: `/administration/admin-users/:layout`, Component: <AdminUsers /> },
-  { path: `/administration/roles/:layout`, Component: <Roles /> },
+  { path: `/administration/admin-users`, Component: <AdminUsers /> },
+  { path: `/administration/roles`, Component: <Roles /> },
 ];

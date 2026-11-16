@@ -7,12 +7,12 @@
 //    elements is rendered by this component or by SidebarMenu, so the guard
 //    never changes behaviour -- it only stops a null crash if the markup moves.
 //
-// `defaultLayout` is Cuba's own line: `customizer.layout` is a string, so
-// Object.keys on it yields character indices. It is only ever used when the URL
-// has no trailing segment, and the value is immediately overwritten, so the
-// oddity is harmless and is left alone.
+// Cuba's `defaultLayout` line went with the layout segment: it called
+// Object.keys on a string, and its only reader was the URL-last-segment
+// fallback that no longer exists.
 
 import { Fragment, useState, useEffect, useRef, useContext } from 'react';
+import { useLocation } from 'react-router-dom';
 import CustomContext from '../../_helper/Customizer';
 import { MENUITEMS } from './Menu';
 import type { MenuItem } from './Menu';
@@ -21,12 +21,13 @@ import SidebarLogo from './SidebarLogo';
 import SidebarMenu from './SidebarMenu';
 
 const Sidebar = () => {
-  const customizer = useContext(CustomContext);
   const { toggleIcon } = useContext(CustomContext);
-  const id = window.location.pathname.split('/').pop();
-  const defaultLayout = Object.keys(customizer.layout);
-
-  const layout = id ? id : defaultLayout;
+  // Cuba keyed the effect below on the URL's last segment, which under its
+  // routing was the layout name -- constant for a session, so the effect ran
+  // once. With the layout segment gone the honest dependency is the path
+  // itself, and the active-menu pass now re-runs on every navigation rather
+  // than only on mount.
+  const { pathname } = useLocation();
   const [, setMainMenu] = useState<unknown>(MENUITEMS);
 
   // **Not Cuba's.** The collapse toggle sits inside this wrapper, so the
@@ -92,7 +93,7 @@ const Sidebar = () => {
       window.removeEventListener('resize', handleResize);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [layout]);
+  }, [pathname]);
 
   const activeClass = () => {
     document.querySelector('.bg-overlay1')?.classList.add('active');

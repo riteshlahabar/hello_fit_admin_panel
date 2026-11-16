@@ -14,7 +14,7 @@ import CustomizerContext from '../../_helper/Customizer';
 import { PUBLIC_URL } from '../../Config/base';
 
 const SidebarLogo = () => {
-  const { toggleSidebar, toggleIcon, layoutURL } = useContext(CustomizerContext);
+  const { toggleSidebar, toggleIcon } = useContext(CustomizerContext);
 
   // **Departs from Cuba, which has a bug here.** Cuba keeps its own
   // `useState(false)` beside the context and writes
@@ -42,7 +42,7 @@ const SidebarLogo = () => {
           The mark is 2048x2048 where Cuba's was 121x35, and nothing in Cuba's
           CSS sizes a logo — `img-fluid` alone would draw it the full 265px
           width of the sidebar. `styles/brand.scss` caps it. */}
-      <Link to={`${PUBLIC_URL}/dashboard/${layoutURL}`}>
+      <Link to={`${PUBLIC_URL}/dashboard`}>
         <Image
           attrImage={{
             className: 'img-fluid d-inline hf-brand',

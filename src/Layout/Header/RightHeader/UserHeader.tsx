@@ -17,14 +17,12 @@ import { useNavigate } from 'react-router-dom';
 import { LogIn, User } from 'react-feather';
 import defaultProfile from '../../../assets/images/dashboard/profile.png';
 import { LI, UL, Image, P } from '../../../AbstractElements';
-import CustomizerContext from '../../../_helper/Customizer';
 import AuthContext from '../../../_helper/Auth';
 import { Account, Admin, LogOut } from '../../../Constant';
 import { PUBLIC_URL } from '../../../Config/base';
 
 const UserHeader = () => {
   const navigate = useNavigate();
-  const { layoutURL } = useContext(CustomizerContext);
   const { admin, logout } = useContext(AuthContext);
 
   const name = admin?.name || Admin;
@@ -60,7 +58,7 @@ const UserHeader = () => {
         <LI
           attrLI={{
             onClick: () =>
-              UserMenuRedirect(`${PUBLIC_URL}/profile/${layoutURL}`),
+              UserMenuRedirect(`${PUBLIC_URL}/profile`),
           }}>
           <User />
           <span>{Account} </span>

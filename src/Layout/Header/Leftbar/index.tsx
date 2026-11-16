@@ -20,7 +20,7 @@ import hellofitLogo from '../../../assets/images/logo/hellofit-logo.png';
 import { PUBLIC_URL } from '../../../Config/base';
 
 const Leftbar = () => {
-  const { layoutURL, toggleSidebar } = useContext(CustomizerContext);
+  const { toggleSidebar } = useContext(CustomizerContext);
   const [sidebartoggle, setSidebartoggle] = useState(true);
   const width = useWindowSize();
 
@@ -81,7 +81,7 @@ const Leftbar = () => {
               screen; this header shows below 991px only, so leaving it would
               have meant Cuba's logo surviving on phones alone. Same file, same
               change — say so if that was not wanted. */}
-          <Link to={`${PUBLIC_URL}/dashboard/${layoutURL}`}>
+          <Link to={`${PUBLIC_URL}/dashboard`}>
             <Image
               attrImage={{
                 className: 'img-fluid hf-brand',

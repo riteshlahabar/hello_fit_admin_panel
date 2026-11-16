@@ -38,8 +38,6 @@ const SidebarMenuItems = ({
   const { layout } = useContext(CustomizerContext);
   const layout1 = localStorage.getItem('sidebar_layout') || layout;
 
-  const id = window.location.pathname.split('/').pop();
-  const layoutId = id;
   const CurrentPath = window.location.pathname;
 
   const { t } = useTranslation();
@@ -134,9 +132,12 @@ const SidebarMenuItems = ({
                 ''
               )}
 
+              {/* `path` is optional on MenuItem because a 'sub' item has none;
+                  these three sites are already inside a type === 'link'
+                  branch, so the fallback is unreachable. */}
               {menuItem.type === 'link' ? (
                 <Link
-                  to={menuItem.path + '/' + layoutId}
+                  to={menuItem.path ?? '#'}
                   className={`sidebar-link sidebar-title link-nav  ${
                     CurrentPath.includes(menuItem.title.toLowerCase())
                       ? 'active'
@@ -212,7 +213,7 @@ const SidebarMenuItems = ({
 
                         {childrenItem.type === 'link' ? (
                           <Link
-                            to={childrenItem.path + '/' + layoutId}
+                            to={childrenItem.path ?? '#'}
                             className={`${
                               CurrentPath.includes(
                                 childrenItem?.title?.toLowerCase(),
@@ -242,7 +243,7 @@ const SidebarMenuItems = ({
                                 <li key={key}>
                                   {childrenSubItem.type === 'link' ? (
                                     <Link
-                                      to={childrenSubItem.path + '/' + layoutId}
+                                      to={childrenSubItem.path ?? '#'}
                                       className={`${
                                         CurrentPath.includes(
                                           childrenSubItem?.title?.toLowerCase(),

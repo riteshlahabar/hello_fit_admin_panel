@@ -20,7 +20,7 @@
 // "selecting a dashboard item opens the relevant management section".
 
 import { Fragment, useCallback, useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Card, CardBody, CardHeader, Col, Container, Input, Row } from 'reactstrap';
 import { Breadcrumbs, H4, H5, H6 } from '../../../AbstractElements';
 import SvgIcon from '../../Common/Component/SvgIcon';
@@ -98,11 +98,6 @@ const CountBox = ({
 );
 
 const Dashboard = () => {
-  const { layout } = useParams<{ layout: string }>();
-  // Links carry the layout segment the sidebar uses, so a tile keeps the
-  // layout the admin is on; 'Dubai' is Cuba's own default (Data/Layouts.ts).
-  const suffix = `/${layout ?? localStorage.getItem('layout') ?? 'Dubai'}`;
-
   const [date, setDate] = useState(todayValue());
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -163,7 +158,7 @@ const Dashboard = () => {
               }
               color='primary'
               icon='customers'
-              to={`/management/customers${suffix}`}
+              to='/management/customers'
             />
           </Col>
           <Col xl='3' sm='6' className='box-col-6'>
@@ -177,7 +172,7 @@ const Dashboard = () => {
               }
               color='secondary'
               icon='user-visitor'
-              to={`/management/instructors${suffix}`}
+              to='/management/instructors'
             />
           </Col>
           <Col xl='3' sm='6' className='box-col-6'>
@@ -189,7 +184,7 @@ const Dashboard = () => {
               }
               color='warning'
               icon='profile-check'
-              to={`/management/instructors${suffix}`}
+              to='/management/instructors'
             />
           </Col>
           <Col xl='3' sm='6' className='box-col-6'>
@@ -203,7 +198,7 @@ const Dashboard = () => {
               }
               color='success'
               icon='income'
-              to={`/management/payments${suffix}`}
+              to='/management/payments'
             />
           </Col>
         </Row>
@@ -233,31 +228,31 @@ const Dashboard = () => {
                     title='Bookings raised'
                     value={dash(summary?.bookings.total)}
                     icon='cart'
-                    to={`/management/bookings${suffix}`}
+                    to='/management/bookings'
                   />
                   <CountBox
                     title='Paid'
                     value={dash(summary?.bookings.byPaymentStatus.PAID)}
                     icon='doller-return'
-                    to={`/management/bookings${suffix}`}
+                    to='/management/bookings'
                   />
                   <CountBox
                     title='Unpaid'
                     value={dash(summary?.bookings.byPaymentStatus.UNPAID)}
                     icon='expense'
-                    to={`/management/bookings${suffix}`}
+                    to='/management/bookings'
                   />
                   <CountBox
                     title='Refunded'
                     value={dash(summary?.bookings.byPaymentStatus.REFUNDED)}
                     icon='return-box'
-                    to={`/management/payments${suffix}`}
+                    to='/management/payments'
                   />
                   <CountBox
                     title='Sessions scheduled'
                     value={dash(summary?.sessions.total)}
                     icon='orders'
-                    to={`/management/bookings${suffix}`}
+                    to='/management/bookings'
                   />
                   <CountBox
                     title='Transactions'
@@ -267,7 +262,7 @@ const Dashboard = () => {
                         : '—'
                     }
                     icon='new-order'
-                    to={`/management/payments${suffix}`}
+                    to='/management/payments'
                   />
                 </Row>
 
@@ -276,37 +271,37 @@ const Dashboard = () => {
                     title='Confirmed'
                     value={dash(sessions?.confirmed)}
                     icon='clock'
-                    to={`/management/bookings${suffix}`}
+                    to='/management/bookings'
                   />
                   <CountBox
                     title='Assigned'
                     value={dash(sessions?.assigned)}
                     icon='profile-check'
-                    to={`/management/bookings${suffix}`}
+                    to='/management/bookings'
                   />
                   <CountBox
                     title='In progress'
                     value={dash(sessions?.inProgress)}
                     icon='24-hour'
-                    to={`/management/bookings${suffix}`}
+                    to='/management/bookings'
                   />
                   <CountBox
                     title='Completed'
                     value={dash(sessions?.completed)}
                     icon='rate'
-                    to={`/management/bookings${suffix}`}
+                    to='/management/bookings'
                   />
                   <CountBox
                     title='Cancelled'
                     value={dash(sessions?.cancelled)}
                     icon='bin'
-                    to={`/management/bookings${suffix}`}
+                    to='/management/bookings'
                   />
                   <CountBox
                     title='No-show'
                     value={dash(sessions?.noShow)}
                     icon='expense'
-                    to={`/management/bookings${suffix}`}
+                    to='/management/bookings'
                   />
                 </Row>
               </CardBody>

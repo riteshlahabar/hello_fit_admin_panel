@@ -1,8 +1,9 @@
 // Ported from Cuba 4.8.26 — src/_helper/Customizer/CustomizerProvider.jsx.
-// Logic is unchanged: the same localStorage keys, the same writes through
-// ConfigDB.data, the same effect that reads the layout name out of the URL's
-// last segment. Only the types and the `.map` -> `.forEach` in that effect
-// differ, because Cuba's version mapped purely for the side effect.
+// Logic is unchanged bar one removal: the same localStorage keys and the same
+// writes through ConfigDB.data. What is gone is the mount effect's walk over
+// the twelve layout names looking for a match on the URL's last segment --
+// routes no longer carry that segment, so it matched nothing. See the comment
+// at the effect.
 
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
@@ -32,10 +33,7 @@ const CustomizerProvider = (props: CustomizerProviderProps) => {
   const defaultLayoutObj = classes.find(
     (item) => Object.values(item).pop() === 'compact-wrapper',
   )!;
-  const layoutURL =
-    localStorage.getItem('layout') || Object.keys(defaultLayoutObj).pop()!;
   const layoutValue = Object.values(defaultLayoutObj).pop()!;
-  const location = window.location.pathname.split('/').pop();
 
   useEffect(() => {
     setLayout(layoutValue);
@@ -43,15 +41,11 @@ const CustomizerProvider = (props: CustomizerProviderProps) => {
       localStorage.getItem('sidebar_icon_type') ||
         ConfigDB.data.settings.sidebar.iconType,
     );
-    classes.forEach((item) => {
-      const item1 = Object.keys(item).pop();
-      if (location === item1) {
-        const val = Object.values(item).pop()!;
-        localStorage.setItem('sidebar_layout', val);
-        ConfigDB.data.settings.sidebar.type = val;
-        setLayout(val);
-      }
-    });
+    // Cuba matched the URL's last segment against its twelve layout names here
+    // and promoted the match to the active sidebar class. That segment is gone
+    // from every route (see Route/Routes.tsx) and the layout switcher that
+    // wrote it was never ported, so the loop could only ever reselect
+    // `compact-wrapper`, which `layoutValue` above already is.
     ConfigDB.data.settings.sidebar_setting = 'default-sidebar';
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -135,7 +129,6 @@ const CustomizerProvider = (props: CustomizerProviderProps) => {
         mixLayout,
         sidebarResponsive,
         IsOpen,
-        layoutURL,
         customizer,
         setIsClose,
         setToggleIcon,
