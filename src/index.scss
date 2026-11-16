@@ -8,3 +8,12 @@
 // Ours. The card header pads by 30px; Cuba's table sits outside CardBody and
 // does not. See the file.
 @import './styles/crud-table.scss';
+
+// Ours. Cuba's collapsed sidebar expands again on hover, and its toggle sits
+// inside that hover area, so clicking looked like it did nothing. See the file.
+@import './styles/sidebar-toggle.scss';
+
+// Ours, and it must stay last. Bridges Bootstrap 5.3's theme variables onto
+// Cuba's `body.dark-only` — without it every Bootstrap surface keeps its light
+// value in dark mode, which is why table rows painted white. See the file.
+@import './styles/dark-bootstrap.scss';

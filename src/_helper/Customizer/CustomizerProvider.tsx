@@ -18,7 +18,12 @@ const CustomizerProvider = (props: CustomizerProviderProps) => {
   const customizer = ConfigDB.data;
   const [layout, setLayout] = useState('');
   const [sidebarIconType, setSidebarIconType] = useState('');
-  const [mix_background_layout, setMixBackgroundLayout] = useState('');
+  // Seeded from ConfigDB, which now reads the localStorage key `MoonLight`
+  // has always written. Cuba started this at `''`, so a reload came back light
+  // whatever had been chosen.
+  const [mix_background_layout, setMixBackgroundLayout] = useState(
+    customizer.color.mix_background_layout,
+  );
   const [toggleIcon, setToggleIcon] = useState(false);
   const [mixLayout, setMixLayout] = useState(false);
   const [sidebarResponsive, setSidebarResponsive] = useState(false);
@@ -81,6 +86,20 @@ const CustomizerProvider = (props: CustomizerProviderProps) => {
   const addSidebarSettings = (settings: string) => {
     ConfigDB.data.settings.sidebar_setting = settings;
   };
+
+  // The body class that `style.scss` and `themes/_dark.scss` key off, applied
+  // here rather than in `MoonLight`. Two reasons:
+  //
+  //  - on boot nothing applied it at all, so a restored `dark-only` setting
+  //    painted nothing until the icon was clicked again;
+  //  - `MoonLight` assigned `document.body.className` outright, which wipes
+  //    every other class on <body>. `Header` puts the layout direction there.
+  //    Nothing currently keys off `body.ltr`, so it broke nothing yet — but it
+  //    was a trap, and `classList` costs the same.
+  useEffect(() => {
+    document.body.classList.remove('light-only', 'dark-only');
+    document.body.classList.add(mix_background_layout || 'light-only');
+  }, [mix_background_layout]);
 
   // Mix layouts like (dark, light, ...)
   const addMixBackgroundLayout = (mix_background_layout: string) => {

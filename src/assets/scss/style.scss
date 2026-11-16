@@ -51,22 +51,34 @@
   --fc-button-hover-border-color: var(--theme-deafult);
 }
 
+// **Rebranded warm, client instruction 16 Nov 2026**, alongside the `$dark-*`
+// ramp in utils/_variables.scss. Four of these ARE that ramp and must stay
+// identical to it, or a card painted by a custom property and a card painted by
+// the SCSS variable end up two different colours on the same screen:
+//
+//   --white, --recent-chart-bg  == $dark-card-background  #24201c
+//   --light-bg, --light2, --recent-box-bg == $dark-body-background  #1a1715
+//   --chart-border, --recent-border == $dark-card-border  #3b342c
+//
+// `--theme-deafult` is deliberately absent, here as in Cuba: the accent does
+// not change between modes, so #e33e29 carries into dark untouched. There is no
+// Cuba purple left anywhere in this tree to hunt down.
 body[class='dark-only'],
 body.dark-only {
-  --light-background: rgba(31, 32, 40, 0.65);
-  --recent-chart-bg: #262932;
-  --light-bg: #1d1e26;
-  --white: #262932;
+  --light-background: rgba(26, 23, 21, 0.65);
+  --recent-chart-bg: #24201c;
+  --light-bg: #1a1715;
+  --white: #24201c;
   --sidebar-border: rgba(255, 255, 255, 0.1);
-  --light2: #1d1e26;
-  --chart-border: #374558;
-  --recent-box-bg: #1d1e26;
-  --recent-border: #374558;
-  --body-font-color: rgba(255, 255, 255, 0.6);
+  --light2: #1a1715;
+  --chart-border: #3b342c;
+  --recent-box-bg: #1a1715;
+  --recent-border: #3b342c;
+  --body-font-color: rgba(255, 246, 236, 0.62);
   --course-light-btn: var(--light-bg);
   --view-grid-bg: var(--light-bg);
-  --view-border-marker: #2c2c45d4;
-  -semi-dark: #1d1e26;
+  --view-border-marker: #2e2823d4;
+  -semi-dark: #1a1715;
 }
 
 // *** base ***

@@ -41,7 +41,13 @@ export class ConfigDB {
       // $primary-color / $secondary-color in assets/scss/utils/_variables.scss.
       primary_color: localStorage.getItem('default_color') || '#e33e29',
       secondary_color: localStorage.getItem('secondary_color') || '#c1b19e',
-      mix_background_layout: 'light-only',
+      // Reads localStorage like the two colours above it. Cuba hardcoded
+      // 'light-only' here while `MoonLight` wrote the chosen value to
+      // localStorage, so nothing ever read it back and **dark mode did not
+      // survive a reload** — the body went light again while the stored key
+      // still said dark.
+      mix_background_layout:
+        localStorage.getItem('mix_background_layout') || 'light-only',
     },
     // Bridged onto Cuba's animate.css keyframes by styles/route-animation.scss;
     // any name in its $route-animations list is valid.

@@ -3,7 +3,7 @@
 // flag; that branch is kept exactly. Its `require()` of the dark logo becomes a
 // static import for Vite.
 
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import { Grid } from 'react-feather';
 import { Link } from 'react-router-dom';
 import { Image } from '../../AbstractElements';
@@ -13,13 +13,22 @@ import CustomizerContext from '../../_helper/Customizer';
 import { PUBLIC_URL } from '../../Config/base';
 
 const SidebarLogo = () => {
-  const { mixLayout, toggleSidebar, layout, layoutURL } =
+  const { mixLayout, toggleSidebar, toggleIcon, layout, layoutURL } =
     useContext(CustomizerContext);
-  const [toggle, setToggle] = useState(false);
 
+  // **Departs from Cuba, which has a bug here.** Cuba keeps its own
+  // `useState(false)` beside the context and writes
+  // `setToggle(!toggle); toggleSidebar(toggle)` — the second call passes the
+  // value from *before* the update, so the sidebar is always one click behind
+  // and the first click does nothing at all.
+  //
+  // The local copy is dropped rather than corrected, because it desynced for a
+  // second reason: `Header/Leftbar` calls `toggleSidebar` directly from its
+  // resize handler, which moves `toggleIcon` without the local copy ever
+  // hearing about it. `toggleIcon` is the one thing `Sidebar/index.tsx`
+  // actually renders from, so it is the only honest source of truth.
   const openCloseSidebar = () => {
-    setToggle(!toggle);
-    toggleSidebar(toggle);
+    toggleSidebar(!toggleIcon);
   };
 
   const layout1 = localStorage.getItem('sidebar_layout') || layout;

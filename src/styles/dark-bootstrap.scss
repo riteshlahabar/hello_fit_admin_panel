@@ -1,0 +1,60 @@
+// Ours. Bridges Bootstrap 5.3's own theming onto Cuba's `body.dark-only`.
+//
+// **This is why table rows stayed white in dark mode.** Bootstrap 5.3 paints a
+// table cell with `background-color: var(--bs-table-bg)`, applied straight on
+// the cell, and its default is `var(--bs-body-bg)`. It ships a full dark set
+// under `[data-bs-theme="dark"]` -- but Cuba predates that convention and
+// switches on `body.dark-only` instead, so the attribute is never set and every
+// Bootstrap variable keeps its light value. The cell then paints #fff directly
+// over whatever Cuba painted the card, and `--bs-table-color` keeps
+// `var(--bs-emphasis-color)` -- #000 -- so the text went black with it.
+//
+// Cuba's own dark theme covers the components it wrote rules for (cards, inputs,
+// modals), which is why only the table was obviously wrong. These variables are
+// the layer underneath all of them, so bridging them fixes the table and closes
+// the same hole in every other Bootstrap component at once. Cuba's explicit
+// rules are more specific and still win wherever it has an opinion.
+//
+// `data-bs-theme="dark"` was the other option and is deliberately not used:
+// it would switch on Bootstrap's entire dark theme alongside Cuba's 6,810-line
+// one, two themes with opinions about the same selectors. Variables only.
+//
+// Values come from utils/_variables.scss -- the warm ramp, not new colours.
+
+@import '../assets/scss/utils/variables';
+
+body.dark-only {
+  // The surface Bootstrap components sit on. Not the page behind them: Cuba
+  // paints `.page-body-wrapper` from `$dark-body-background` with far more
+  // specificity, so that stays the darker recessed tone and is unaffected.
+  --bs-body-bg: #{$dark-card-background};
+  --bs-body-color: #{$dark-all-font-color};
+  --bs-border-color: #{$dark-card-border};
+  --bs-secondary-bg: #{$dark-card-inbox};
+  --bs-tertiary-bg: #{$dark-body-background};
+
+  // `--bs-emphasis-color` is the one that turned table text black; Bootstrap
+  // derives striping and several component text colours from it too.
+  --bs-emphasis-color: #fff6ec;
+  --bs-emphasis-color-rgb: 255, 246, 236;
+  --bs-secondary-color: #{rgba(#fff6ec, 0.45)};
+
+  // Tables set their own copies on `.table`, so the block above does not reach
+  // them -- Bootstrap re-declares each one there. Spelled out rather than
+  // inherited, and given the three tones deliberately: the body matches the
+  // card it sits in, a striped row recedes, a hovered row lifts.
+  .table {
+    --bs-table-color: #{$dark-all-font-color};
+    --bs-table-bg: #{$dark-card-background};
+    --bs-table-border-color: #{$dark-card-border};
+
+    --bs-table-striped-color: #{$dark-all-font-color};
+    --bs-table-striped-bg: #{$dark-body-background};
+
+    --bs-table-hover-color: #{$dark-all-font-color};
+    --bs-table-hover-bg: #{$dark-card-inbox};
+
+    --bs-table-active-color: #{$dark-all-font-color};
+    --bs-table-active-bg: #{$dark-card-inbox};
+  }
+}

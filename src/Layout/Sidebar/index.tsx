@@ -12,7 +12,7 @@
 // has no trailing segment, and the value is immediately overwritten, so the
 // oddity is harmless and is left alone.
 
-import { Fragment, useState, useEffect, useContext } from 'react';
+import { Fragment, useState, useEffect, useRef, useContext } from 'react';
 import CustomContext from '../../_helper/Customizer';
 import { MENUITEMS } from './Menu';
 import type { MenuItem } from './Menu';
@@ -28,6 +28,25 @@ const Sidebar = () => {
 
   const layout = id ? id : defaultLayout;
   const [, setMainMenu] = useState<unknown>(MENUITEMS);
+
+  // **Not Cuba's.** The collapse toggle sits inside this wrapper, so the
+  // pointer is necessarily on the sidebar at the moment it collapses — and
+  // Cuba's own `div.sidebar-wrapper.close_icon:hover {width:265px}` puts it
+  // straight back. The content rule beside it,
+  // `close_icon ~ .page-body {margin-left:90px}`, carries no `:hover`, so the
+  // page reflows while the sidebar does not: clicking looks broken.
+  //
+  // So the hover expand is suppressed, but only for the one case that causes
+  // it — a collapse that happened while the pointer was already inside. It is
+  // released the moment the pointer leaves, which restores Cuba's hover-to-peek
+  // for every later approach. `styles/sidebar-toggle.scss` is the other half.
+  const pointerInside = useRef(false);
+  const [hoverLocked, setHoverLocked] = useState(false);
+
+  useEffect(() => {
+    if (!toggleIcon) setHoverLocked(false);
+    else if (pointerInside.current) setHoverLocked(true);
+  }, [toggleIcon]);
   const [width, setWidth] = useState(0);
 
   const handleScroll = () => {
@@ -117,7 +136,16 @@ const Sidebar = () => {
           closeOverlay();
         }}></div>
       <div
-        className={`sidebar-wrapper ${toggleIcon ? 'close_icon' : ''}`}
+        className={`sidebar-wrapper ${toggleIcon ? 'close_icon' : ''}${
+          hoverLocked ? ' hover-locked' : ''
+        }`}
+        onMouseEnter={() => {
+          pointerInside.current = true;
+        }}
+        onMouseLeave={() => {
+          pointerInside.current = false;
+          setHoverLocked(false);
+        }}
         sidebar-layout='stroke-svg'>
         <SidebarIcon />
         <SidebarLogo />

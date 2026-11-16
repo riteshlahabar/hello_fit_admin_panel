@@ -37,6 +37,7 @@ import ConfigDB from '../Config/ThemeConfig';
 const AppLayout = () => {
   const { layout } = useContext(CustomizerContext);
   const { sidebarIconType } = useContext(CustomizerContext);
+  const { mix_background_layout } = useContext(CustomizerContext);
 
   const layout1 = localStorage.getItem('sidebar_layout') || layout;
   const sideBarIcon =
@@ -78,7 +79,14 @@ const AppLayout = () => {
           <Footer />
         </div>
       </div>
-      <ToastContainer />
+      {/* `theme` follows the app. react-toastify ships its own stylesheet,
+          imported last in app.scss and never touched by Cuba's dark theme --
+          `Toastify` appears nowhere in themes/_dark.scss -- so without this the
+          toasts stayed white-on-white over a dark page. Every CRUD screen
+          raises them, so it was the most visible of the white leaks. */}
+      <ToastContainer
+        theme={mix_background_layout === 'dark-only' ? 'dark' : 'light'}
+      />
     </Fragment>
   );
 };

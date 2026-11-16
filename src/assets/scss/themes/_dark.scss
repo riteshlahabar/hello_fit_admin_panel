@@ -3288,7 +3288,7 @@ body {
                 tbody {
                   tr {
                     &:nth-of-type(odd) {
-                      --bs-table-accent-bg: #1d1e26;
+                      --bs-table-accent-bg: #{$dark-body-background};
                     }
                   }
                 }
@@ -3937,7 +3937,7 @@ body {
             > tbody {
               > tr {
                 &:hover {
-                  --bs-table-accent-bg: #1d1e26;
+                  --bs-table-accent-bg: #{$dark-body-background};
 
                   td,
                   th {

@@ -1,0 +1,75 @@
+// Ours. The other half of the `hover-locked` flag set in Layout/Sidebar/index.tsx.
+//
+// Cuba collapses the sidebar with `.close_icon` and then expands it again on
+// `:hover`, which is a real feature — a 90px icon rail you can peek into. The
+// trouble is only that the collapse toggle lives *inside* the sidebar, so the
+// pointer is always on it at the moment of the click and the hover rules undo
+// the collapse instantly. Meanwhile the sibling rule that shifts the content,
+// `.close_icon ~ .page-body { margin-left: 90px }`, has no `:hover` guard and
+// fires anyway — the page widens, the sidebar does not move, and the button
+// reads as broken.
+//
+// Each rule below mirrors one of Cuba's `:hover` rules (app.css 37643-37684)
+// with `.hover-locked` inserted, so it is exactly one class more specific and
+// wins, and restores the value from Cuba's own collapsed block (app.css
+// 37609-37642). Nothing here invents a style: it is Cuba's collapsed state,
+// re-asserted for as long as the lock is on.
+//
+// The lock lives only from a click until the pointer leaves the sidebar. Hover
+// to peek still works on every later approach.
+
+.page-wrapper.compact-wrapper
+  .page-body-wrapper
+  div.sidebar-wrapper.close_icon.hover-locked:hover {
+  width: auto;
+
+  .badge {
+    opacity: 0;
+    width: 0;
+    padding: 0;
+  }
+
+  .sidebar-main .sidebar-links > li {
+    max-width: 86px;
+    margin: 0;
+
+    a {
+      text-align: center;
+      padding: 12px 14px;
+
+      span {
+        display: none;
+      }
+    }
+
+    .sidebar-submenu a {
+      display: none;
+    }
+  }
+
+  .sidebar-main-title {
+    display: none !important;
+    opacity: 0;
+  }
+
+  .logo-wrapper {
+    display: none;
+  }
+
+  .logo-icon-wrapper {
+    text-align: right;
+    display: block;
+  }
+}
+
+// Cuba flips this one for RTL, so the lock has to flip back with it.
+[dir='rtl']
+  .page-wrapper.compact-wrapper
+  .page-body-wrapper
+  div.sidebar-wrapper.close_icon.hover-locked:hover
+  .sidebar-main
+  .sidebar-links
+  > li
+  a {
+  text-align: center;
+}

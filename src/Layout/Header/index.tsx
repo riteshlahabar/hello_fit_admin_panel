@@ -72,8 +72,14 @@ const Header = () => {
     }
   };
 
-  const handleSearchKeyword = (keyword: string) => {
-    keyword ? addFix() : removeFix();
+  const handleSearchKeyword = (rawKeyword: string) => {
+    if (rawKeyword) addFix();
+    else removeFix();
+
+    // Cuba lowercases the menu titles but compares them against the keyword as
+    // typed, so a capital anywhere in it matched nothing -- "Customers" found
+    // no Customers. Lowercased once here instead of at three call sites.
+    const keyword = rawKeyword.toLowerCase();
     const items: MenuItem[] = [];
 
     MENUITEMS.forEach((menuItems) => {

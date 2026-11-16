@@ -60,6 +60,15 @@ export const MENUITEMS: MenuGroup[] = [
         active: false,
       },
       {
+        // Directly under Customers, client's order (16 Nov 2026). The two
+        // people-screens belong together; it used to sit last, below Reviews.
+        title: 'Trainers',
+        icon: 'learning',
+        type: 'link',
+        path: '/management/instructors',
+        active: false,
+      },
+      {
         title: 'Bookings',
         icon: 'calendar',
         type: 'link',
@@ -95,13 +104,6 @@ export const MENUITEMS: MenuGroup[] = [
             active: false,
           },
         ],
-      },
-      {
-        title: 'Trainers',
-        icon: 'learning',
-        type: 'link',
-        path: '/management/instructors',
-        active: false,
       },
     ],
   },

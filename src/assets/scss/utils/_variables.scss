@@ -98,21 +98,38 @@ $font-awesome: FontAwesome;
 $font-ICO: IcoFont;
 
 // dark layout variables
-$dark-body-background: #1d1e26;
-$dark-card-background: #262932;
-$dark-card-inbox: #323846;
-$dark-small-font-color: #98a6ad;
-$dark-all-font-color: rgba(255, 255, 255, 0.6);
+//
+// **Rebranded warm, client instruction 16 Nov 2026.** Cuba's dark ramp is a
+// cool blue-grey around hue 225 (#1d1e26 / #262932 / #374558), which fought the
+// warm ivory-and-taupe palette the rest of the panel wears — dark mode read as
+// a different product. These are the same ramp rotated to the brand's own hue
+// (~30, the taupe/ivory family) at the same lightness steps, so every contrast
+// relationship Cuba designed is preserved: page darker than card, card darker
+// than inbox, border lightest.
+//
+// Six of these drive 500+ declarations across themes/_dark.scss, which is why
+// recolouring happens here and not in that file. **`style.scss`'s
+// `body.dark-only` custom-property block mirrors four of them** and must move
+// with them -- see the note there.
+//
+// `$dark-editor-document` is deliberately NOT in this scheme: despite the name
+// it is a light-mode text colour (`.tt-suggestion` in pages/_dashboard_default)
+// and has no use in _dark.scss at all. Left exactly as Cuba had it.
+$dark-body-background: #1a1715;
+$dark-card-background: #24201c;
+$dark-card-inbox: #332d26;
+$dark-small-font-color: #a89e92;
+$dark-all-font-color: rgba(255, 246, 236, 0.62);
 $light-all-font-color: rgba(255, 255, 255, 0.2);
 $sidebar-submenu-font-color: rgba(255, 255, 255, 0.6);
 $dark-border-color: $dark-body-background;
-$dark-card-border: #374558;
+$dark-card-border: #3b342c;
 $dark-editor-document: #2b2b2b;
-$bg-dark-color: #1f2533;
-$dark-datatable-odd: #1f232b;
-$dark-datatable-sorting: #1c212b;
-$dark-datatable-sorting-even: #22262f;
-$dark-even-hover-sorting: #191e27;
+$bg-dark-color: #1c1916;
+$dark-datatable-odd: #1e1a17;
+$dark-datatable-sorting: #1b1714;
+$dark-datatable-sorting-even: #211d19;
+$dark-even-hover-sorting: #171411;
 
 //General tag settings
 $body-font-size: 14px;
