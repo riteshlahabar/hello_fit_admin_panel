@@ -17,3 +17,11 @@
 // Cuba's `body.dark-only` — without it every Bootstrap surface keeps its light
 // value in dark mode, which is why table rows painted white. See the file.
 @import './styles/dark-bootstrap.scss';
+
+// Ours. Sizes the HelloFit mark that replaced Cuba's logos — a cap is required,
+// the mark is 2048px square and Cuba's CSS sizes no logo at all. See the file.
+@import './styles/brand.scss';
+
+// Ours. The project palette on the login screen — Cuba's stock photo and its
+// lavender input tint were the two things there that were never HelloFit's.
+@import './styles/login-brand.scss';

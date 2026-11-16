@@ -1,0 +1,58 @@
+// Ours. Puts the project palette on the login screen. Client, 16 Nov 2026.
+//
+// **Overrides rather than edits.** `pages/_login.scss` is Cuba's, 259 lines,
+// and the house rule is that our colour goes in `src/styles/` so their file
+// stays the verbatim thing it claims to be. Loaded after it, so plain class
+// selectors win on source order without any specificity games.
+//
+// Two things on that screen were never HelloFit's:
+//
+//  1. `login_bg.jpg` — Cuba's own stock photograph, 40 KB, behind the whole
+//     page. No palette can fix a photo.
+//  2. `#f3f3ff`, hardcoded twice at _login.scss:69 and :77 — a cold lavender
+//     mixed from Cuba's old #7366ff purple. It tints the input fields, so it
+//     is the colour a person actually looks at while typing, sitting in a
+//     warm ivory-and-taupe product.
+//
+// `#dfdfdf` on :58 is left alone: it borders a checkbox, and our sign-in form
+// has no checkbox — Cuba's "remember me" was dropped with the social buttons.
+
+@import '../assets/scss/utils/variables';
+
+// Brand ivory with the accent and the taupe held well back. A photograph is
+// replaced by light, not by another picture, so the white card still reads as
+// the only thing on the page.
+//
+// One line restores Cuba's: `background: url('../assets/images/login/login_bg.jpg')`.
+.login-card {
+  background:
+    radial-gradient(circle at 18% 22%, rgba($primary-color, 0.1), transparent 45%),
+    radial-gradient(circle at 82% 78%, rgba($secondary-color, 0.26), transparent 52%),
+    linear-gradient(135deg, $main-body-color 0%, $body-color 100%);
+  background-attachment: fixed;
+
+  // `$body-color` is the frontview's "soft" recessed surface — the same token
+  // the CRUD table header bar uses, and the warm answer to Cuba's lavender.
+  input {
+    background-color: $body-color;
+  }
+
+  .login-main .theme-form .login-social-title::before,
+  .checkbox label::before {
+    background-color: $body-color;
+  }
+}
+
+// Dark mode runs the warm ramp from utils/_variables.scss, so the login screen
+// does not snap back to cool the moment the moon is clicked.
+body.dark-only .login-card {
+  background:
+    radial-gradient(circle at 18% 22%, rgba($primary-color, 0.16), transparent 45%),
+    radial-gradient(circle at 82% 78%, rgba($secondary-color, 0.1), transparent 52%),
+    linear-gradient(135deg, $dark-body-background 0%, $dark-card-background 100%);
+
+  input {
+    background-color: $dark-card-inbox;
+    color: $dark-all-font-color;
+  }
+}

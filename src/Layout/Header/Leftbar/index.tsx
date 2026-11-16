@@ -16,8 +16,7 @@ import { AlignCenter } from 'react-feather';
 import { Link } from 'react-router-dom';
 import { Image } from '../../../AbstractElements';
 import CustomizerContext from '../../../_helper/Customizer';
-import logoLight from '../../../assets/images/logo/logo.png';
-import logoDark from '../../../assets/images/logo/logo_dark.png';
+import hellofitLogo from '../../../assets/images/logo/hellofit-logo.png';
 import { PUBLIC_URL } from '../../../Config/base';
 
 const Leftbar = () => {
@@ -77,19 +76,17 @@ const Leftbar = () => {
     <Fragment>
       <Col className='header-logo-wrapper col-auto p-0' id='out_side_click'>
         <div className='logo-wrapper'>
+          {/* Cuba's for-light / for-dark wordmark pair, swapped for the one
+              HelloFit mark. The client asked for the sidebar and the login
+              screen; this header shows below 991px only, so leaving it would
+              have meant Cuba's logo surviving on phones alone. Same file, same
+              change — say so if that was not wanted. */}
           <Link to={`${PUBLIC_URL}/dashboard/${layoutURL}`}>
             <Image
               attrImage={{
-                className: 'img-fluid for-light',
-                src: logoLight,
-                alt: '',
-              }}
-            />
-            <Image
-              attrImage={{
-                className: 'img-fluid for-dark',
-                src: logoDark,
-                alt: '',
+                className: 'img-fluid hf-brand',
+                src: hellofitLogo,
+                alt: 'HelloFit',
               }}
             />
           </Link>

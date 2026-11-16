@@ -1,0 +1,38 @@
+// Ours. Sizes the HelloFit mark that replaced Cuba's logos on 16 Nov 2026.
+//
+// **A cap is not optional here.** Cuba's CSS sizes no logo anywhere — its
+// images were already the right pixels, a 121x35 wordmark and a 35x35 icon, so
+// `img-fluid` had nothing to do. The HelloFit mark is 2048x2048, and
+// `img-fluid` is only `max-width:100%; height:auto`, so dropped in unchecked it
+// would draw the full 265px width of the sidebar and shove the menu off screen.
+//
+// Heights match what Cuba's own images were, so the mark lands where the
+// wordmark did and no other rule has to move:
+//
+//   sidebar header   35px   (logo.png was 121x35)
+//   collapsed rail   35px   (logo-icon.png was 35x35)
+//   login card       72px   — larger on purpose; it is the only thing on that
+//                             card above the form, where Cuba had a wordmark
+//                             wide enough to carry the space on its own.
+//
+// `width: auto` alongside each height keeps the square square. Without it
+// `img-fluid`'s `height: auto` and an explicit height fight and the mark
+// stretches.
+
+.hf-brand {
+  height: 35px;
+  width: auto;
+}
+
+.hf-brand-icon {
+  height: 35px;
+  width: 35px;
+}
+
+// The login card is not inside `.page-wrapper`, so nothing above applies to it
+// by inheritance — the larger size is its own class rather than a context
+// override.
+.hf-brand-lg {
+  height: 72px;
+  width: auto;
+}

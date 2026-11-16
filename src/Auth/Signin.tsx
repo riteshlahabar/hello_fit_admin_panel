@@ -19,9 +19,7 @@ import { Form, FormGroup, Input, Label } from 'reactstrap';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { Btn, H4, P, Image } from '../AbstractElements';
 import AuthContext from '../_helper/Auth';
-import logoWhite from '../assets/images/logo/logo.png';
-import logoDark from '../assets/images/logo/logo_dark.png';
-import { PUBLIC_URL } from '../Config/base';
+import hellofitLogo from '../assets/images/logo/hellofit-logo.png';
 
 const Signin = () => {
   const navigate = useNavigate();
@@ -55,22 +53,27 @@ const Signin = () => {
       <div className='login-card'>
         <div>
           <div>
-            <a className='logo' href={PUBLIC_URL || '/'}>
+            {/* Cuba's two logo images were here, for-light and for-dark.
+                Both gone on the client's instruction, 16 Nov 2026 — it was the
+                template's mark, not HelloFit's.
+
+                One image now, not two: Cuba swapped a light and a dark
+                wordmark, and the HelloFit mark reads on either background.
+
+                `.login-card .logo` (app.css:34078) is only
+                `display:block; margin-bottom:30px; text-align:center`, so it
+                centres this exactly as it centred Cuba's. The height cap is
+                ours — see `styles/brand.scss` for why one is needed. */}
+            <div className='logo'>
               <Image
                 attrImage={{
-                  className: 'img-fluid for-light',
-                  src: logoWhite,
-                  alt: 'login page',
+                  className: 'img-fluid hf-brand hf-brand-lg',
+                  src: hellofitLogo,
+                  alt: 'HelloFit',
                 }}
               />
-              <Image
-                attrImage={{
-                  className: 'img-fluid for-dark',
-                  src: logoDark,
-                  alt: 'login page',
-                }}
-              />
-            </a>
+              <H4 attrH4={{ className: 'mb-0 mt-3' }}>Welcome To HelloFit</H4>
+            </div>
           </div>
 
           <div className='login-main'>
