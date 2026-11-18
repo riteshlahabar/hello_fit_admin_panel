@@ -233,7 +233,6 @@ const Customers = () => {
       update={customersApi.update}
       canCreate={false}
       inactiveLabel='Show removed'
-      actionsWidth='225px'
       rowActions={(row, refresh) => (
         <StatusModal customer={row} onDone={refresh} />
       )}

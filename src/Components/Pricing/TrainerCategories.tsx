@@ -69,7 +69,6 @@ const TrainerCategories = () => {
       update={pricingApi.trainerCategories.update}
       hasSearch={false}
       inactiveLabel='Show inactive'
-      actionsWidth='200px'
       rowActions={(row, refresh) => (
         <StatusButton
           isActive={row.isActive}

@@ -28,6 +28,9 @@ import {
   CardHeader,
   Col,
   Container,
+  DropdownItem,
+  DropdownMenu,
+  DropdownToggle,
   Form,
   FormGroup,
   Input,
@@ -39,10 +42,20 @@ import {
   PaginationLink,
   Row,
   Table,
+  UncontrolledDropdown,
 } from 'reactstrap';
 import { toast } from 'react-toastify';
 import { Breadcrumbs, Btn, H3, H5 } from '../../AbstractElements';
 import type { Listed, PageMeta } from '../../Services/masters.api';
+
+/** What a `select`, `multiselect` or `checkboxes` field offers. */
+export interface FieldOption {
+  value: string;
+  label: string;
+}
+
+/** The dialog's current values, as the flat state the form holds. */
+export type FormValues = Record<string, string | number | boolean>;
 
 /** A field in the add/edit dialog. */
 export interface FieldDef<T> {
@@ -53,18 +66,28 @@ export interface FieldDef<T> {
     | 'number'
     | 'date'
     | 'checkbox'
+    | 'checkboxes'
     | 'select'
     | 'multiselect'
     | 'textarea'
     | 'email'
     | 'password';
-  /** Options for `select` and `multiselect`. */
-  options?: { value: string; label: string }[];
+  /**
+   * Options for `select`, `multiselect` and `checkboxes`. A function is given
+   * the dialog's current values, so one field can narrow another — the
+   * package screen's Category narrowing its Services (client, 18 Nov 2026).
+   */
+  options?: FieldOption[] | ((form: FormValues) => FieldOption[]);
   required?: boolean;
   placeholder?: string;
   help?: string;
   /** Hide the field when editing — e.g. a parent that must not be moved. */
   createOnly?: boolean;
+  /**
+   * A field the dialog needs but the API does not take. Left out of the body,
+   * which matters: the API runs `forbidNonWhitelisted` and would 400 on it.
+   */
+  transient?: boolean;
   /** Full-width rather than Cuba's default half. */
   wide?: boolean;
   /** Initial value when adding. */
@@ -123,10 +146,6 @@ export interface CrudPageProps<T extends { id: string }> {
   inactiveLabel?: string;
   /** Hide the search box where the endpoint has no `q` — the role list. */
   hasSearch?: boolean;
-  /** Width of the Actions column. Fixed layout needs a real value here —
-   * size it to the buttons the screen renders so the last one lands on the
-   * 30px gutter. */
-  actionsWidth?: string;
   /**
    * Hide the Add button. Customers and instructors both create their own
    * records — by OTP signup and by applying from the app — so there is no
@@ -143,7 +162,15 @@ export interface CrudPageProps<T extends { id: string }> {
   rowActions?: (row: T, refresh: () => void) => ReactNode;
 }
 
-type FormState = Record<string, string | number | boolean>;
+type FormState = FormValues;
+
+/** A field's options, which may be a function of the other fields. */
+const optionsOf = <T,>(f: FieldDef<T>, form: FormState): FieldOption[] =>
+  typeof f.options === 'function' ? f.options(form) : (f.options ?? []);
+
+/** Comma-joined ids in the flat form state, as a list again. */
+const picked = (value: string | number | boolean | undefined): string[] =>
+  String(value ?? '').split(',').filter(Boolean);
 
 function initialForm<T>(fields: FieldDef<T>[]): FormState {
   const state: FormState = {};
@@ -187,7 +214,6 @@ const CrudPage = <T extends { id: string }>({
   hasActiveFlag = true,
   inactiveLabel = 'Show retired',
   hasSearch = true,
-  actionsWidth = '225px',
   canCreate = true,
   canDelete,
   rowActions,
@@ -254,11 +280,13 @@ const CrudPage = <T extends { id: string }>({
     const body: Record<string, unknown> = {};
     for (const f of fields) {
       if (editing && f.createOnly) continue;
+      if (f.transient) continue;
       const value = form[f.name];
       if (f.type === 'checkbox') body[f.name] = Boolean(value);
       // A multi-select with nothing picked is a real instruction ("sold
       // nowhere"), so an empty value is sent rather than skipped.
-      else if (f.type === 'multiselect') body[f.name] = value ?? '';
+      else if (f.type === 'multiselect' || f.type === 'checkboxes')
+        body[f.name] = value ?? '';
       else if (value === '' || value === undefined) continue;
       else if (f.type === 'number') body[f.name] = Number(value);
       else body[f.name] = value;
@@ -389,7 +417,7 @@ const CrudPage = <T extends { id: string }>({
                           {c.header}
                         </th>
                       ))}
-                      <th scope='col' style={{ width: actionsWidth }}>
+                      <th scope='col' style={{ width: '72px' }}>
                         Actions
                       </th>
                     </tr>
@@ -418,30 +446,44 @@ const CrudPage = <T extends { id: string }>({
                             <td key={c.header}>{c.cell(row)}</td>
                           ))}
                           <td>
-                            <div className='d-flex gap-2 justify-content-center'>
-                              {rowActions?.(row, () => void refresh())}
-                              {update ? (
-                                <Btn
-                                  attrBtn={{
-                                    color: 'light',
-                                    size: 'sm',
-                                    onClick: () => openEdit(row),
-                                  }}>
-                                  Edit
-                                </Btn>
-                              ) : null}
-                              {remove && (!canDelete || canDelete(row)) ? (
-                                <Btn
-                                  attrBtn={{
-                                    color: 'danger',
-                                    size: 'sm',
-                                    outline: true,
-                                    onClick: () => void onDelete(row),
-                                  }}>
-                                  {deleteVerb}
-                                </Btn>
-                              ) : null}
-                            </div>
+                            {/* One three-dots menu per row (client, 18 Nov
+                                2026): the actions columns had grown to four
+                                buttons and 460px on some screens. The row's
+                                own routes come in as `rowActions` and keep
+                                their own buttons, so they sit in the menu as
+                                a block rather than as DropdownItems. */}
+                            <UncontrolledDropdown>
+                              <DropdownToggle
+                                color='light'
+                                size='sm'
+                                className='hf-row-menu'
+                                aria-label='Row actions'>
+                                ⋯
+                              </DropdownToggle>
+                              <DropdownMenu end>
+                                {update ? (
+                                  <DropdownItem
+                                    onClick={() => openEdit(row)}>
+                                    Edit
+                                  </DropdownItem>
+                                ) : null}
+                                {rowActions ? (
+                                  <div className='hf-row-menu-actions'>
+                                    {rowActions(row, () => void refresh())}
+                                  </div>
+                                ) : null}
+                                {remove && (!canDelete || canDelete(row)) ? (
+                                  <Fragment>
+                                    <DropdownItem divider />
+                                    <DropdownItem
+                                      className='txt-danger'
+                                      onClick={() => void onDelete(row)}>
+                                      {deleteVerb}
+                                    </DropdownItem>
+                                  </Fragment>
+                                ) : null}
+                              </DropdownMenu>
+                            </UncontrolledDropdown>
                           </td>
                         </tr>
                       ))
@@ -524,20 +566,62 @@ const CrudPage = <T extends { id: string }>({
                           {f.label}
                           {f.required ? ' *' : ''}
                         </Label>
-                        {f.type === 'multiselect' ? (
+                        {f.type === 'checkboxes' ? (
+                          // A row of switches over a fixed, small set — the
+                          // package's seven weekdays (client, 18 Nov 2026).
+                          // Stored comma-joined like a multi-select, so the
+                          // API client parses both the same way.
+                          <div className='d-flex flex-wrap gap-3 pt-1'>
+                            {optionsOf(f, form).map((o) => {
+                              const on = picked(form[f.name]).includes(o.value);
+                              return (
+                                <div
+                                  className='form-check form-check-inline mb-0'
+                                  key={o.value}>
+                                  <Input
+                                    type='checkbox'
+                                    className='form-check-input'
+                                    id={`${f.name}-${o.value}`}
+                                    checked={on}
+                                    onChange={() =>
+                                      setForm((s) => {
+                                        const next = picked(s[f.name]).filter(
+                                          (v) => v !== o.value,
+                                        );
+                                        if (!on) next.push(o.value);
+                                        // Option order, not click order: the
+                                        // API reads 0..6 and so does a human.
+                                        const ordered = optionsOf(f, s)
+                                          .map((opt) => opt.value)
+                                          .filter((v) => next.includes(v));
+                                        return {
+                                          ...s,
+                                          [f.name]: ordered.join(','),
+                                        };
+                                      })
+                                    }
+                                  />
+                                  <Label
+                                    className='form-check-label mb-0'
+                                    for={`${f.name}-${o.value}`}>
+                                    {o.label}
+                                  </Label>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        ) : f.type === 'multiselect' ? (
                           <Input
                             type='select'
                             multiple
                             id={f.name}
                             style={{ height: 'auto', minHeight: '140px' }}
-                            value={String(form[f.name] ?? '')
-                              .split(',')
-                              .filter(Boolean)}
+                            value={picked(form[f.name])}
                             onChange={(e) => {
                               // reactstrap types every Input target as an
                               // HTMLInputElement, so the select has to be
                               // named for `selectedOptions` to exist.
-                              const picked = Array.from(
+                              const chosen = Array.from(
                                 (e.target as unknown as HTMLSelectElement)
                                   .selectedOptions,
                                 (option) => option.value,
@@ -546,10 +630,10 @@ const CrudPage = <T extends { id: string }>({
                               // values, and the API client splits it back.
                               setForm((s) => ({
                                 ...s,
-                                [f.name]: picked.join(','),
+                                [f.name]: chosen.join(','),
                               }));
                             }}>
-                            {(f.options ?? []).map((o) => (
+                            {optionsOf(f, form).map((o) => (
                               <option key={o.value} value={o.value}>
                                 {o.label}
                               </option>
@@ -568,7 +652,7 @@ const CrudPage = <T extends { id: string }>({
                               }))
                             }>
                             <option value=''>— select —</option>
-                            {(f.options ?? []).map((o) => (
+                            {optionsOf(f, form).map((o) => (
                               <option key={o.value} value={o.value}>
                                 {o.label}
                               </option>

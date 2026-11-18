@@ -24,9 +24,13 @@ import StatusBadge from '../Common/StatusBadge';
 import CrudPage from '../Common/CrudPage';
 import StatusButton from './StatusButton';
 import { packageFields } from './package.fields';
-import type { ColumnDef } from '../Common/CrudPage';
+import type { ServiceOption } from './package.fields';
+import type { ColumnDef, FieldOption } from '../Common/CrudPage';
 import { pricingApi, type Package } from '../../Services/pricing.api';
-import { fetchServiceOptions } from '../../Services/catalog.api';
+import {
+  fetchCategoryOptions,
+  fetchServiceOptions,
+} from '../../Services/catalog.api';
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -83,15 +87,19 @@ const columns: ColumnDef<Package>[] = [
 ];
 
 const Packages = () => {
-  const [services, setServices] = useState<
-    { value: string; label: string }[]
-  >([]);
+  const [categories, setCategories] = useState<FieldOption[]>([]);
+  const [services, setServices] = useState<ServiceOption[]>([]);
 
   useEffect(() => {
     let cancelled = false;
     void (async () => {
-      const options = await fetchServiceOptions();
-      if (!cancelled) setServices(options);
+      const [cats, svcs] = await Promise.all([
+        fetchCategoryOptions(),
+        fetchServiceOptions(),
+      ]);
+      if (cancelled) return;
+      setCategories(cats);
+      setServices(svcs);
     })();
     return () => {
       cancelled = true;
@@ -104,7 +112,10 @@ const Packages = () => {
     [],
   );
 
-  const fields = useMemo(() => packageFields(services), [services]);
+  const fields = useMemo(
+    () => packageFields(categories, services),
+    [categories, services],
+  );
 
   return (
     <CrudPage<Package>
@@ -119,7 +130,6 @@ const Packages = () => {
       remove={pricingApi.packages.remove}
       deleteVerb='Delete'
       inactiveLabel='Show inactive'
-      actionsWidth='210px'
       rowActions={(row, refresh) => (
         <StatusButton
           isActive={row.isActive}

@@ -328,7 +328,6 @@ const ReviewsPage = ({
       load={load}
       canCreate={false}
       hasActiveFlag={false}
-      actionsWidth='150px'
       rowActions={(row, refresh) => (
         <ModerateModal review={row} onDone={refresh} />
       )}

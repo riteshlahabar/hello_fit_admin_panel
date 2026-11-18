@@ -267,7 +267,6 @@ const Payments = () => {
       load={load}
       canCreate={false}
       hasActiveFlag={false}
-      actionsWidth='120px'
       rowActions={(row) => <ViewModal payment={row} />}
       toolbar={
         <Input

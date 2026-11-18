@@ -145,7 +145,6 @@ const Services = () => {
       remove={catalogApi.services.remove}
       deleteVerb='Delete'
       inactiveLabel='Show hidden'
-      actionsWidth='210px'
       rowActions={(row, refresh) => (
         <VisibilityButton service={row} onDone={refresh} />
       )}

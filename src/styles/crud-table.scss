@@ -143,3 +143,36 @@ body.dark-only .hf-crud-table > thead > tr > th {
   width: 165px;
   flex: 0 0 auto;
 }
+
+// The row's three-dots menu (client, 18 Nov 2026). The Actions columns had
+// grown to four buttons and 460px on Admin Users and Instructors, which is
+// what pushed the tables into a horizontal scroll.
+//
+// The toggle is a plain square — no caret, because the dots already say
+// "menu" — and `::after` is cleared since reactstrap draws a caret on every
+// DropdownToggle.
+.hf-row-menu {
+  width: 32px;
+  padding: 0;
+  line-height: 1.2;
+  font-size: 18px;
+  letter-spacing: 1px;
+
+  &::after {
+    display: none;
+  }
+}
+
+// A screen's own row actions (a status switch, a password reset) keep their
+// own buttons, so they sit in the menu as a stacked block rather than as
+// DropdownItems. `.btn` is widened to fill the menu so the block reads as a
+// list with the Edit and Delete items above and below it.
+.hf-row-menu-actions {
+  display: grid;
+  gap: 6px;
+  padding: 4px 16px;
+
+  .btn {
+    width: 100%;
+  }
+}

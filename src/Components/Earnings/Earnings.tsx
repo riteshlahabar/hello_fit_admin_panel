@@ -265,7 +265,6 @@ const Earnings = () => {
       canCreate={false}
       hasActiveFlag={false}
       hasSearch={false}
-      actionsWidth='140px'
       rowActions={(row, refresh) => (
         <HoldButton earning={row} onDone={refresh} />
       )}

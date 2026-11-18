@@ -414,7 +414,6 @@ const Instructors = () => {
       update={instructorsApi.update}
       canCreate={false}
       hasActiveFlag={false}
-      actionsWidth='460px'
       rowActions={(row, refresh) => (
         <Fragment>
           <DocumentsModal instructor={row} />

@@ -1,23 +1,42 @@
 // The Add / Edit Package dialog's fields, kept out of `Packages.tsx` so
 // neither file grows past the project's 200-line limit.
 //
-// Shape agreed before building (standing rule): Name, Icon, Services,
-// Sessions, Persons, Free sessions, Validity, Percent adjust, Allowed
-// weekdays, Fixed trainer, Sort order, Active.
+// Shape agreed before building (standing rule): Name, Icon, Category,
+// Services, Sessions, Persons, Free sessions, Validity, Percent adjust,
+// Allowed weekdays, Fixed trainer, Sort order, Active.
 //
 // **Services and Persons both landed 18 Nov 2026** (client): a package names
 // the services it is sold on and carries its own head count, which is what
 // replaced Group Slabs. → state/pricing-rules.md
+//
+// **Category is a filter, not a field** (client, 18 Nov 2026): it narrows the
+// Services list and is `transient`, so it never reaches the API — which runs
+// `forbidNonWhitelisted` and would refuse it. Weekdays are seven checkboxes.
 
-import type { FieldDef } from '../Common/CrudPage';
+import type { FieldDef, FieldOption } from '../Common/CrudPage';
 import type { Package } from '../../Services/pricing.api';
 
+export interface ServiceOption extends FieldOption {
+  categoryId: string;
+}
+
+const WEEKDAYS: FieldOption[] = [
+  { value: '0', label: 'Sun' },
+  { value: '1', label: 'Mon' },
+  { value: '2', label: 'Tue' },
+  { value: '3', label: 'Wed' },
+  { value: '4', label: 'Thu' },
+  { value: '5', label: 'Fri' },
+  { value: '6', label: 'Sat' },
+];
+
 /**
- * Services are loaded by the screen and passed in, so the multi-select is
- * the live catalogue rather than a second copy of it.
+ * Categories and services are loaded by the screen and passed in, so both
+ * lists are the live catalogue rather than a second copy of it.
  */
 export function packageFields(
-  services: { value: string; label: string }[],
+  categories: FieldOption[],
+  services: ServiceOption[],
 ): FieldDef<Package>[] {
   return [
     { name: 'name', label: 'Name', required: true },
@@ -31,10 +50,22 @@ export function packageFields(
       readValue: (row) => row.icon ?? '',
     },
     {
+      name: 'categoryFilter',
+      label: 'Category',
+      type: 'select',
+      options: categories,
+      transient: true,
+      help: 'Narrows the Services list below. Leave empty to see every service.',
+    },
+    {
       name: 'serviceIds',
       label: 'Services',
       type: 'multiselect',
-      options: services,
+      // Narrowed by the Category above; empty category means the lot.
+      options: (form) =>
+        services.filter(
+          (s) => !form.categoryFilter || s.categoryId === form.categoryFilter,
+        ),
       wide: true,
       help: 'Ctrl / Cmd-click to pick several. A package with no service ticked is sold nowhere.',
       readValue: (row) => (row.services ?? []).map((s) => s.id).join(','),
@@ -79,9 +110,10 @@ export function packageFields(
     {
       name: 'allowedWeekdays',
       label: 'Allowed weekdays',
-      placeholder: '1,3,5',
+      type: 'checkboxes',
+      options: WEEKDAYS,
       wide: true,
-      help: '0 = Sunday to 6 = Saturday, comma separated. Leave empty for any weekday.',
+      help: 'Tick none for any weekday.',
       readValue: (row) => row.allowedWeekdays.join(','),
     },
     {

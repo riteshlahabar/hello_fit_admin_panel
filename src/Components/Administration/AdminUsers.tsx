@@ -344,7 +344,6 @@ const AdminUsers = () => {
       remove={adminUsersApi.remove}
       deleteVerb='Remove'
       inactiveLabel='Show removed'
-      actionsWidth='460px'
       rowActions={(row, refresh) => (
         <Fragment>
           <StatusModal admin={row} onDone={refresh} />

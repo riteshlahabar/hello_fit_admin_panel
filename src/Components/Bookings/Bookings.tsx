@@ -373,7 +373,6 @@ const Bookings = () => {
       load={load}
       canCreate={false}
       hasActiveFlag={false}
-      actionsWidth='260px'
       rowActions={(row, refresh) => (
         <Fragment>
           <ViewModal booking={row} />

@@ -98,9 +98,8 @@ export async function fetchCategoryOptions() {
 }
 
 /**
- * Service options for the package screen's multi-select (client, 18 Nov
- * 2026). The label carries the category, because "Yoga" alone does not say
- * which of four trainer tiers the admin is ticking.
+ * Service options for the package screen (client, 18 Nov 2026). `categoryId`
+ * rides along so the dialog's Category select can narrow the list.
  */
 export async function fetchServiceOptions() {
   // `limit` is capped at 100 by the API — 200 is a 400 and an empty dropdown.
@@ -108,6 +107,7 @@ export async function fetchServiceOptions() {
   if (!result.ok) return [];
   return result.value.rows.map((s) => ({
     value: s.id,
-    label: s.category ? `${s.category.name} — ${s.name}` : s.name,
+    label: s.name,
+    categoryId: s.categoryId,
   }));
 }

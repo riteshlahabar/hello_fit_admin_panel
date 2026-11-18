@@ -233,7 +233,6 @@ const Coupons = () => {
       remove={couponsApi.remove}
       deleteVerb='Retire'
       inactiveLabel='Show inactive'
-      actionsWidth='265px'
       reloadKey={validity}
       rowActions={(row, refresh) => (
         <StatusButton coupon={row} onDone={refresh} />

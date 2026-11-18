@@ -50,15 +50,14 @@ export interface TrainerCategory {
 }
 
 /**
- * The dialog has no array input, so weekdays are typed as "1,3,5" and parsed
- * here. Empty stays absent, which the API reads as "any weekday".
+ * Weekdays arrive comma-joined from the dialog's seven checkboxes. **No day
+ * ticked means "any weekday", so an empty value sends `[]`** rather than
+ * being dropped — dropping it left the stored days untouched and a package
+ * could never be opened back up to the whole week (18 Nov 2026).
  */
 function weekdaysBody(body: Record<string, unknown>): Record<string, unknown> {
   const raw = body.allowedWeekdays;
-  if (raw === undefined || raw === '') {
-    const { allowedWeekdays: _drop, ...rest } = body;
-    return rest;
-  }
+  if (raw === undefined) return body;
 
   return {
     ...body,

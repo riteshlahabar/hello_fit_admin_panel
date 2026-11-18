@@ -322,7 +322,6 @@ const Roles = () => {
       deleteVerb='Delete'
       hasActiveFlag={false}
       hasSearch={false}
-      actionsWidth='260px'
       reloadKey={reloadKey}
       canDelete={(r) => !r.isSystem}
       rowActions={(row) => (
