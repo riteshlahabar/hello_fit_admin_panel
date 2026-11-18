@@ -205,13 +205,6 @@ export const MENUITEMS: MenuGroup[] = [
         active: false,
       },
       {
-        title: 'Group Slabs',
-        icon: 'charts',
-        type: 'link',
-        path: '/marketing/group-slabs',
-        active: false,
-      },
-      {
         title: 'Trainer Categories',
         icon: 'charts',
         type: 'link',

@@ -54,10 +54,11 @@ export interface FieldDef<T> {
     | 'date'
     | 'checkbox'
     | 'select'
+    | 'multiselect'
     | 'textarea'
     | 'email'
     | 'password';
-  /** Options for `select`. */
+  /** Options for `select` and `multiselect`. */
   options?: { value: string; label: string }[];
   required?: boolean;
   placeholder?: string;
@@ -255,6 +256,9 @@ const CrudPage = <T extends { id: string }>({
       if (editing && f.createOnly) continue;
       const value = form[f.name];
       if (f.type === 'checkbox') body[f.name] = Boolean(value);
+      // A multi-select with nothing picked is a real instruction ("sold
+      // nowhere"), so an empty value is sent rather than skipped.
+      else if (f.type === 'multiselect') body[f.name] = value ?? '';
       else if (value === '' || value === undefined) continue;
       else if (f.type === 'number') body[f.name] = Number(value);
       else body[f.name] = value;
@@ -520,7 +524,33 @@ const CrudPage = <T extends { id: string }>({
                           {f.label}
                           {f.required ? ' *' : ''}
                         </Label>
-                        {f.type === 'select' ? (
+                        {f.type === 'multiselect' ? (
+                          <Input
+                            type='select'
+                            multiple
+                            id={f.name}
+                            style={{ height: 'auto', minHeight: '140px' }}
+                            value={String(form[f.name] ?? '')
+                              .split(',')
+                              .filter(Boolean)}
+                            onChange={(e) =>
+                              setForm((s) => ({
+                                ...s,
+                                // Stored comma-joined: FormState holds flat
+                                // values, and the API client splits it back.
+                                [f.name]: Array.from(
+                                  e.target.selectedOptions,
+                                  (o) => o.value,
+                                ).join(','),
+                              }))
+                            }>
+                            {(f.options ?? []).map((o) => (
+                              <option key={o.value} value={o.value}>
+                                {o.label}
+                              </option>
+                            ))}
+                          </Input>
+                        ) : f.type === 'select' ? (
                           <Input
                             type='select'
                             id={f.name}

@@ -34,12 +34,7 @@ export interface CatalogService {
   categoryId: string;
   durationMin: number;
   basePrice: string;
-  allowMultiPerson: boolean;
-  maxParticipants: number;
-  isHomeService: boolean;
   description: string | null;
-  inclusions: string | null;
-  level: string;
   isActive: boolean;
   category?: { id: string; name: string; isActive: boolean };
   _count?: { instructorServices: number; bookings: number };
@@ -77,7 +72,7 @@ export const catalogApi = {
       api.post<CatalogService>(`${BASE}/services`, body),
     /**
      * Editing a service (client instruction, 18 Nov 2026). Same fields as the
-     * Add form, `allowMultiPerson` included — nothing else could change it.
+     * Add form. A service carries no head count — that lives on the Package.
      */
     update: (id: string, body: Record<string, unknown>) =>
       api.patch<CatalogService>(`${BASE}/services/${id}`, body),
@@ -100,4 +95,18 @@ export async function fetchCategoryOptions() {
   const result = await catalogApi.categories.list({ limit: 100 });
   if (!result.ok) return [];
   return result.value.rows.map((c) => ({ value: c.id, label: c.name }));
+}
+
+/**
+ * Service options for the package screen's multi-select (client, 18 Nov
+ * 2026). The label carries the category, because "Yoga" alone does not say
+ * which of four trainer tiers the admin is ticking.
+ */
+export async function fetchServiceOptions() {
+  const result = await catalogApi.services.list({ limit: 200 });
+  if (!result.ok) return [];
+  return result.value.rows.map((s) => ({
+    value: s.id,
+    label: s.category ? `${s.category.name} — ${s.name}` : s.name,
+  }));
 }

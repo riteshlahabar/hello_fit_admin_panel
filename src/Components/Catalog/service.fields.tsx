@@ -1,22 +1,16 @@
 // The Add / Edit Service dialog fields, kept out of `Services.tsx` so neither
-// grows past the project's 200-line limit.
+// file grows past the project's 200-line limit.
 //
 // Shape agreed before building (standing rule): Category, Name, Duration,
-// Base price, Level, Allow group + Max participants, Home service,
-// Description, Inclusions, Active.
+// Base price, Description, Visible.
 //
-// The Add / Edit dialog uses the same fields — the service edit route
-// landed 18 Nov 2026 (client), so nothing here is create-only.
+// **A service carries no head count, level, home-service flag or inclusions**
+// — the client dropped all four on 18 Nov 2026. `persons` lives on the
+// Package now, which is also the only discount there is.
+// → state/pricing-rules.md
 
 import type { FieldDef } from '../Common/CrudPage';
 import type { CatalogService } from '../../Services/catalog.api';
-
-const LEVELS = [
-  { value: 'ALL_LEVELS', label: 'All levels' },
-  { value: 'BEGINNER', label: 'Beginner' },
-  { value: 'INTERMEDIATE', label: 'Intermediate' },
-  { value: 'ADVANCED', label: 'Advanced' },
-];
 
 /**
  * Categories are loaded by the screen and passed in, so the dropdown is the
@@ -48,38 +42,14 @@ export function serviceFields(
       type: 'number',
       required: true,
       defaultValue: 0,
-      help: 'Per session, per person. Every package percent and group slab is applied to this.',
+      help: 'Per session, per person. Every package percent is applied to this.',
     },
+    { name: 'description', label: 'Description', type: 'textarea', wide: true },
     {
-      name: 'level',
-      label: 'Level',
-      type: 'select',
-      options: LEVELS,
-      defaultValue: 'ALL_LEVELS',
-    },
-    {
-      // The two pricing systems never meet: off means packages and one
-      // person, on means group slabs and no package.
-      name: 'allowMultiPerson',
-      label: 'Group booking (prices by slab)',
-      type: 'checkbox',
-      defaultValue: false,
-    },
-    {
-      name: 'maxParticipants',
-      label: 'Max participants',
-      type: 'number',
-      defaultValue: 1,
-      help: 'Only for a group service, and then at least 2. Leave at 1 otherwise.',
-    },
-    {
-      name: 'isHomeService',
-      label: 'Home service',
+      name: 'isActive',
+      label: 'Visible to customers',
       type: 'checkbox',
       defaultValue: true,
     },
-    { name: 'description', label: 'Description', type: 'textarea', wide: true },
-    { name: 'inclusions', label: 'Inclusions', type: 'textarea', wide: true },
-    { name: 'isActive', label: 'Visible to customers', type: 'checkbox', defaultValue: true },
   ];
 }

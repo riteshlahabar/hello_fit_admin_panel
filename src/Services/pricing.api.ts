@@ -1,18 +1,18 @@
-// Typed calls for the three pricing menus — /admin/packages,
-// /admin/group-slabs and /admin/trainer-categories.
+// Typed calls for the two pricing menus — /admin/packages and
+// /admin/trainer-categories.
 //
 // Admin sets every price and a provider never does (client, 17 Nov 2026), so
-// unlike the Services screen these three are full CRUD. Two shapes they share:
+// unlike the Services screen these are full CRUD. Two shapes they share:
 //
-//   * **No delete anywhere.** A booking keeps its `packageId` and the invoice
-//     behind it must stay explicable, so a row leaves the dropdown by going
-//     inactive. The API has no delete route to call.
 //   * **Status is its own route** (`PATCH :id/status`), not a field on the
 //     edit body — which is why the screens pass a `rowActions` button rather
 //     than an Active checkbox on the dialog when editing.
+//   * A package holds a **percent**, never a price. The money is
+//     `Service.basePrice`: base x persons x sessions, then the percent.
 //
-// A package and a slab both hold a **percent**, never a price. The money is
-// `Service.basePrice`. → state/pricing-rules.md
+// Group Slabs were deleted on 18 Nov 2026 — a group deal is now a package
+// with `persons` above 1, sold on the services the admin ticks.
+// → state/pricing-rules.md
 
 import { api } from './api';
 import { listed, qs } from './masters.api';
@@ -24,6 +24,8 @@ export interface Package {
   /** Card symbol — an emoji or glyph; null means the card draws its own. */
   icon: string | null;
   sessionCount: number;
+  /** People attending each session; the package decides the head count. */
+  persons: number;
   validityDays: number;
   /** Signed: +20 is the trial markup, -15 the intensive discount. */
   percentAdjust: number;
@@ -34,15 +36,10 @@ export interface Package {
   sortOrder: number;
   isActive: boolean;
   _count?: { bookings: number };
+  /** The services this package is sold on; empty means sold nowhere. */
+  services?: { id: string; name: string }[];
 }
 
-export interface GroupSlab {
-  id: string;
-  /** The row's identity — unique, and not editable. */
-  minPersons: number;
-  percentOff: number;
-  isActive: boolean;
-}
 
 export interface TrainerCategory {
   id: string;
@@ -72,8 +69,22 @@ function weekdaysBody(body: Record<string, unknown>): Record<string, unknown> {
   };
 }
 
+/**
+ * The services multi-select arrives comma-joined from the dialog. An empty
+ * value is kept, not dropped: it means "sold nowhere" (client, 18 Nov 2026).
+ */
+function packageBody(body: Record<string, unknown>): Record<string, unknown> {
+  const withDays = weekdaysBody(body);
+  const raw = withDays.serviceIds;
+  if (raw === undefined) return withDays;
+
+  return {
+    ...withDays,
+    serviceIds: String(raw).split(',').filter(Boolean),
+  };
+}
+
 const PACKAGES = '/admin/packages';
-const SLABS = '/admin/group-slabs';
 const CATEGORIES = '/admin/trainer-categories';
 
 export const pricingApi = {
@@ -81,28 +92,14 @@ export const pricingApi = {
     list: async (query: ListQuery = {}) =>
       listed<Package>(await api.get<Package[]>(`${PACKAGES}${qs(query)}`)),
     create: (body: Record<string, unknown>) =>
-      api.post<Package>(PACKAGES, weekdaysBody(body)),
+      api.post<Package>(PACKAGES, packageBody(body)),
     update: (id: string, body: Record<string, unknown>) =>
-      api.patch<Package>(`${PACKAGES}/${id}`, weekdaysBody(body)),
+      api.patch<Package>(`${PACKAGES}/${id}`, packageBody(body)),
     /** Hard delete; refused while a booking points at the package. */
     remove: (id: string) => api.delete(`${PACKAGES}/${id}`),
     /** Reports the booking count in its message when deactivating. */
     setStatus: (id: string, isActive: boolean) =>
       api.patch<Package>(`${PACKAGES}/${id}/status`, { isActive }),
-  },
-
-  groupSlabs: {
-    list: async (query: ListQuery = {}) =>
-      listed<GroupSlab>(await api.get<GroupSlab[]>(`${SLABS}${qs(query)}`)),
-    /** A retired row for the same size is revived rather than duplicated. */
-    create: (body: Record<string, unknown>) => api.post<GroupSlab>(SLABS, body),
-    /** `percentOff` only — `minPersons` in the body is a 400. */
-    update: (id: string, body: Record<string, unknown>) =>
-      api.patch<GroupSlab>(`${SLABS}/${id}`, { percentOff: body.percentOff }),
-    setStatus: (id: string, isActive: boolean) =>
-      api.patch<GroupSlab>(`${SLABS}/${id}/status`, { isActive }),
-    /** Nothing stores a slab, so the delete always goes through. */
-    remove: (id: string) => api.delete(`${SLABS}/${id}`),
   },
 
   trainerCategories: {
