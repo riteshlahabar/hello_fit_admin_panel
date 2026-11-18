@@ -533,17 +533,22 @@ const CrudPage = <T extends { id: string }>({
                             value={String(form[f.name] ?? '')
                               .split(',')
                               .filter(Boolean)}
-                            onChange={(e) =>
+                            onChange={(e) => {
+                              // reactstrap types every Input target as an
+                              // HTMLInputElement, so the select has to be
+                              // named for `selectedOptions` to exist.
+                              const picked = Array.from(
+                                (e.target as unknown as HTMLSelectElement)
+                                  .selectedOptions,
+                                (option) => option.value,
+                              );
+                              // Stored comma-joined: FormState holds flat
+                              // values, and the API client splits it back.
                               setForm((s) => ({
                                 ...s,
-                                // Stored comma-joined: FormState holds flat
-                                // values, and the API client splits it back.
-                                [f.name]: Array.from(
-                                  e.target.selectedOptions,
-                                  (o) => o.value,
-                                ).join(','),
-                              }))
-                            }>
+                                [f.name]: picked.join(','),
+                              }));
+                            }}>
                             {(f.options ?? []).map((o) => (
                               <option key={o.value} value={o.value}>
                                 {o.label}
