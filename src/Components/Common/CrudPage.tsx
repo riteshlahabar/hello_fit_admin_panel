@@ -44,6 +44,7 @@ import {
   Table,
   UncontrolledDropdown,
 } from 'reactstrap';
+import { MoreVertical } from 'react-feather';
 import { toast } from 'react-toastify';
 import { Breadcrumbs, Btn, H3, H5 } from '../../AbstractElements';
 import type { Listed, PageMeta } from '../../Services/masters.api';
@@ -99,6 +100,16 @@ export interface FieldDef<T> {
 export interface ColumnDef<T> {
   header: string;
   cell: (row: T) => ReactNode;
+  /**
+   * Share of the table for this column — a CSS width, normally a percentage.
+   * `.hf-crud-table` is `table-layout: fixed`, which splits the width equally
+   * between every column that gives no width of its own, so a screen whose
+   * columns are *not* equally important sets them here (Packages: a wide Name
+   * and Services next to eight narrow numbers). Percentages that overshoot
+   * 100% are scaled back by the fixed-layout algorithm rather than overflowing
+   * into a horizontal scrollbar, so they only need to be roughly right.
+   */
+  width?: string;
 }
 
 export interface CrudPageProps<T extends { id: string }> {
@@ -413,7 +424,10 @@ const CrudPage = <T extends { id: string }>({
                   <thead>
                     <tr>
                       {columns.map((c) => (
-                        <th scope='col' key={c.header}>
+                        <th
+                          scope='col'
+                          key={c.header}
+                          style={c.width ? { width: c.width } : undefined}>
                           {c.header}
                         </th>
                       ))}
@@ -446,21 +460,29 @@ const CrudPage = <T extends { id: string }>({
                             <td key={c.header}>{c.cell(row)}</td>
                           ))}
                           <td>
-                            {/* One three-dots menu per row (client, 18 Nov
-                                2026): the actions columns had grown to four
-                                buttons and 460px on some screens. The row's
-                                own routes come in as `rowActions` and keep
-                                their own buttons, so they sit in the menu as
-                                a block rather than as DropdownItems. */}
+                            {/* One dots menu per row (client, 18 Nov 2026):
+                                the actions columns had grown to four buttons
+                                and 460px on some screens. The row's own
+                                routes come in as `rowActions` and keep their
+                                own buttons, so they sit in the menu as a
+                                block rather than as DropdownItems —
+                                `row-menu.scss` flattens those buttons so the
+                                menu still reads as one list.
+
+                                Vertical dots, not horizontal (client, 18 Nov
+                                2026): the horizontal set reads as truncated
+                                text. `MoreVertical` rather than the `⋮`
+                                character, which renders at whatever weight
+                                the fallback font has. */}
                             <UncontrolledDropdown>
                               <DropdownToggle
-                                color='light'
+                                color='link'
                                 size='sm'
                                 className='hf-row-menu'
                                 aria-label='Row actions'>
-                                ⋯
+                                <MoreVertical />
                               </DropdownToggle>
-                              <DropdownMenu end>
+                              <DropdownMenu end className='hf-row-menu-pop'>
                                 {update ? (
                                   <DropdownItem
                                     onClick={() => openEdit(row)}>
@@ -475,8 +497,11 @@ const CrudPage = <T extends { id: string }>({
                                 {remove && (!canDelete || canDelete(row)) ? (
                                   <Fragment>
                                     <DropdownItem divider />
+                                    {/* Not `.txt-danger`: Cuba defines that
+                                        only in its prebuilt color.css, which
+                                        the panel does not compile. */}
                                     <DropdownItem
-                                      className='txt-danger'
+                                      className='hf-menu-danger'
                                       onClick={() => void onDelete(row)}>
                                       {deleteVerb}
                                     </DropdownItem>
@@ -567,11 +592,16 @@ const CrudPage = <T extends { id: string }>({
                           {f.required ? ' *' : ''}
                         </Label>
                         {f.type === 'checkboxes' ? (
-                          // A row of switches over a fixed, small set — the
+                          // A row of checkboxes over a fixed, small set — the
                           // package's seven weekdays (client, 18 Nov 2026).
                           // Stored comma-joined like a multi-select, so the
                           // API client parses both the same way.
-                          <div className='d-flex flex-wrap gap-3 pt-1'>
+                          //
+                          // `hf-check-grid` carries the layout *and* makes the
+                          // boxes visible: Cuba's reset paints every plain
+                          // checkbox transparent, so this field showed its
+                          // labels and nothing to tick. → form-checks.scss
+                          <div className='hf-check-grid'>
                             {optionsOf(f, form).map((o) => {
                               const on = picked(form[f.name]).includes(o.value);
                               return (

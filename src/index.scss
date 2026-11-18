@@ -9,6 +9,14 @@
 // does not. See the file.
 @import './styles/crud-table.scss';
 
+// Ours. The row actions menu on every CrudPage table — vertical dots, and a
+// menu whose own items and a screen's action buttons read as one list.
+@import './styles/row-menu.scss';
+
+// Ours. Cuba's reset paints every plain checkbox transparent, so the package
+// dialog's weekdays showed their labels and no boxes. See the file.
+@import './styles/form-checks.scss';
+
 // Ours. Cuba's collapsed sidebar expands again on hover, and its toggle sits
 // inside that hover area, so clicking looked like it did nothing. See the file.
 @import './styles/sidebar-toggle.scss';

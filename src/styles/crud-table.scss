@@ -144,35 +144,28 @@ body.dark-only .hf-crud-table > thead > tr > th {
   flex: 0 0 auto;
 }
 
-// The row's three-dots menu (client, 18 Nov 2026). The Actions columns had
-// grown to four buttons and 460px on Admin Users and Instructors, which is
-// what pushed the tables into a horizontal scroll.
-//
-// The toggle is a plain square — no caret, because the dots already say
-// "menu" — and `::after` is cleared since reactstrap draws a caret on every
-// DropdownToggle.
-.hf-row-menu {
-  width: 32px;
-  padding: 0;
-  line-height: 1.2;
-  font-size: 18px;
-  letter-spacing: 1px;
+// The row actions menu moved to `row-menu.scss` on 18 Nov 2026 — this file is
+// the table, that one is the menu, and the menu grew.
 
-  &::after {
-    display: none;
-  }
+// Two cell shapes a column opts into, both of them against the `overflow-wrap:
+// anywhere` above. That rule is right for a cell whose column took whatever
+// width was going, but wrong once a column sets its own `width`: a package
+// *name* broken mid-word is harder to read than one cut short, because the eye
+// cannot tell a wrapped name from two names.
+//
+// Needs `display: block` and a width to resolve against, which a `div` in a
+// fixed-layout cell has; it does not work on an inline `span`.
+.hf-cell-oneline {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  // The full value is on the element's `title`, so nothing is lost.
 }
 
-// A screen's own row actions (a status switch, a password reset) keep their
-// own buttons, so they sit in the menu as a stacked block rather than as
-// DropdownItems. `.btn` is widened to fill the menu so the block reads as a
-// list with the Edit and Delete items above and below it.
-.hf-row-menu-actions {
+// A list of values, one per line — the Packages screen's Services (client,
+// 18 Nov 2026). Comma-joined, four service names read as one run-on string.
+.hf-cell-lines {
   display: grid;
-  gap: 6px;
-  padding: 4px 16px;
-
-  .btn {
-    width: 100%;
-  }
+  gap: 2px;
+  line-height: 1.35;
 }

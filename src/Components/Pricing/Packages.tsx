@@ -38,12 +38,22 @@ const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const percentLabel = (value: number) =>
   `${value > 0 ? '+' : ''}${Number(value)}%`;
 
+// Column widths, client 18 Nov 2026: Name and Services are the two columns a
+// human reads, the other seven are one number each, so equal shares of the
+// table (`table-layout: fixed`'s default) spent most of the width on numbers
+// and squeezed both of the useful columns into two wrapped lines. These sum to
+// 100% with the 72px Actions column outside them, which is what keeps the
+// table inside its card instead of under a horizontal scrollbar.
 const columns: ColumnDef<Package>[] = [
   {
     header: 'Name',
+    width: '20%',
+    // Name on its own line — truncated with the full value on hover rather
+    // than broken mid-word, which is what `.hf-crud-table` does by default —
+    // and the weekdays under it, where they read as a qualifier on the name.
     cell: (r) => (
       <div>
-        <div>
+        <div className='hf-cell-oneline' title={r.name}>
           <span className='f-18 me-2'>{r.icon || '◆'}</span>
           {r.name}
         </div>
@@ -58,26 +68,47 @@ const columns: ColumnDef<Package>[] = [
   },
   {
     header: 'Services',
+    width: '22%',
+    // One service per line (client, 18 Nov 2026). Comma-joined, four services
+    // read as one run-on string and there was no telling where one ended.
+    //
     // No service ticked means the customer never sees it, so that reads as a
     // warning rather than a blank cell.
     cell: (r) =>
       r.services?.length ? (
-        <span className='f-12'>
-          {r.services.map((s) => s.name).join(', ')}
-        </span>
+        <div className='hf-cell-lines'>
+          {r.services.map((s) => (
+            <div className='hf-cell-oneline f-12' key={s.id} title={s.name}>
+              {s.name}
+            </div>
+          ))}
+        </div>
       ) : (
         <StatusBadge tone='light-warning'>Sold nowhere</StatusBadge>
       ),
   },
-  { header: 'Sessions', cell: (r) => r.sessionCount },
-  { header: 'Persons', cell: (r) => r.persons },
-  { header: 'Free', cell: (r) => r.freeSessionCount || '—' },
-  { header: 'Validity', cell: (r) => `${r.validityDays} days` },
-  { header: 'Percent', cell: (r) => percentLabel(r.percentAdjust) },
-  { header: 'Bookings', cell: (r) => r._count?.bookings ?? 0 },
-  { header: 'Sort', cell: (r) => r.sortOrder },
+  { header: 'Sessions', width: '8%', cell: (r) => r.sessionCount },
+  { header: 'Persons', width: '8%', cell: (r) => r.persons },
+  { header: 'Free', width: '7%', cell: (r) => r.freeSessionCount || '—' },
+  {
+    header: 'Validity',
+    width: '10%',
+    cell: (r) => `${r.validityDays} days`,
+  },
+  {
+    header: 'Percent',
+    width: '7%',
+    cell: (r) => percentLabel(r.percentAdjust),
+  },
+  // Bookings dropped (client, 18 Nov 2026) — the count is not something the
+  // administrator manages from this screen, and `_count` is still read by the
+  // delete refusal, which is where the number actually matters.
+  { header: 'Sort', width: '6%', cell: (r) => r.sortOrder },
   {
     header: 'Status',
+    // The widest of the seven narrow columns: its value is a badge, and
+    // "Inactive" inside one needs ~100px before the pill starts to clip.
+    width: '12%',
     cell: (r) => (
       <StatusBadge tone={r.isActive ? 'light-success' : 'light-secondary'}>
         {r.isActive ? 'Active' : 'Inactive'}

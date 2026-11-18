@@ -1,0 +1,182 @@
+// The row actions menu on every CrudPage table (client, 18 Nov 2026).
+//
+// Moved out of `crud-table.scss` — that file is about the table's gutter and
+// column widths, this one is about the menu, and neither may grow past the
+// project's 200-line limit.
+//
+// Three things the first pass got wrong, all reported by the client:
+//
+//  1. The toggle drew horizontal dots. Vertical dots are the convention for a
+//     row menu (the horizontal set reads as "truncated text"), so CrudPage now
+//     renders react-feather's `MoreVertical` and this file sizes it.
+//  2. A screen's own row actions came in as real `Btn`s, so the menu mixed
+//     coloured, boxed buttons with plain text items. They are flattened here
+//     to look exactly like a `.dropdown-item` — same padding, same hover, no
+//     border, no fill — so the menu reads as one list.
+//  3. The items inherited the cell's `text-align: center` and its
+//     `overflow-wrap: anywhere` (crud-table.scss centres every cell), so
+//     "Edit" sat mid-air and "Deactivate" could break mid-word. The menu
+//     resets both.
+//
+// `.txt-danger` is not usable for the destructive item: Cuba defines it only
+// in its *prebuilt* `color.css` / `style.css`, and the panel compiles
+// `app.scss` instead, so the class resolves to nothing. Hence
+// `.hf-menu-danger`, coloured here.
+
+// The toggle: a 32px ghost circle that fills on hover, no caret — the dots
+// already say "menu", and reactstrap draws a caret on every DropdownToggle.
+.hf-row-menu {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background-color: transparent;
+  color: $semi-dark;
+  box-shadow: none;
+  // The toggle is a `btn-link`, which Bootstrap underlines.
+  text-decoration: none;
+
+  &::after {
+    display: none;
+  }
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover,
+  &:focus,
+  &:active,
+  &.show {
+    border: none;
+    background-color: $light-semi-gray;
+    color: $theme-body-font-color;
+    box-shadow: none;
+    text-decoration: none;
+  }
+}
+
+.hf-row-menu-pop {
+  // Wide enough for the longest label any screen puts in here ("Reset
+  // password"), so nothing wraps and every menu on the page is the same width.
+  min-width: 196px;
+  padding: 6px;
+  border: 1px solid rgba($black, 0.06);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba($theme-body-font-color, 0.14);
+  // Undo the cell's centring and its word breaking, both inherited.
+  text-align: start;
+
+  // One shape for a plain item and for a screen's own action button.
+  .dropdown-item,
+  .hf-row-menu-actions .btn {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    background-color: transparent;
+    background-image: none;
+    box-shadow: none;
+    color: $theme-body-font-color;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.35;
+    text-align: start;
+    white-space: nowrap;
+
+    &:hover,
+    &:focus,
+    &:active,
+    &:focus-visible {
+      border: none;
+      background-color: $sidebar-active-bg;
+      color: $theme-body-font-color;
+      box-shadow: none;
+    }
+
+    &:disabled,
+    &.disabled {
+      background-color: transparent;
+      opacity: 0.45;
+    }
+  }
+
+  .hf-menu-danger {
+    color: $danger-color;
+
+    &:hover,
+    &:focus,
+    &:active {
+      background-color: rgba($danger-color, 0.1);
+      color: $danger-color;
+    }
+  }
+
+  .dropdown-divider {
+    margin: 6px 4px;
+    border-top-color: rgba($black, 0.08);
+  }
+}
+
+// A screen's own row actions sit between Edit and the destructive item as a
+// stacked block, on the same 2px rhythm as the items around them.
+.hf-row-menu-actions {
+  display: grid;
+  gap: 2px;
+  padding: 0;
+}
+
+// Dark theme. Cuba repaints the card and the dropdown surface; the menu
+// follows it rather than staying a white card in a dark panel.
+body.dark-only {
+  .hf-row-menu {
+    color: $dark-all-font-color;
+
+    &:hover,
+    &:focus,
+    &:active,
+    &.show {
+      background-color: $dark-card-inbox;
+      color: $white;
+    }
+  }
+
+  .hf-row-menu-pop {
+    border-color: rgba($white, 0.08);
+    box-shadow: 0 10px 30px rgba($black, 0.45);
+
+    .dropdown-item,
+    .hf-row-menu-actions .btn {
+      color: $dark-all-font-color;
+
+      &:hover,
+      &:focus,
+      &:active {
+        background-color: $dark-card-inbox;
+        color: $white;
+      }
+    }
+
+    .hf-menu-danger {
+      color: lighten($danger-color, 18%);
+
+      &:hover,
+      &:focus,
+      &:active {
+        background-color: rgba($danger-color, 0.22);
+        color: lighten($danger-color, 22%);
+      }
+    }
+
+    .dropdown-divider {
+      border-top-color: rgba($white, 0.1);
+    }
+  }
+}

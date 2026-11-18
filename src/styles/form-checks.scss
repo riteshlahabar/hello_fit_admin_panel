@@ -1,0 +1,83 @@
+// Visible checkboxes in the CrudPage dialog's `checkboxes` field — the Add /
+// Edit Package dialog's seven weekdays (client, 18 Nov 2026: "checkboxes not
+// appearing for days, only days seen").
+//
+// Cause, in Cuba itself: `assets/scss/base/_reset.scss` ends with
+//
+//   .form-check-input[type='checkbox'] {
+//     background-color: transparent;
+//     border-color: transparent;
+//     &:checked { background-color: transparent; border-color: transparent; }
+//   }
+//
+// so every *plain* checkbox in the template is painted away — no border, no
+// fill — and only its label shows. Cuba gets away with it because its own
+// pages use `.form-switch` everywhere, and `components/_switch.scss` repaints
+// the switch track; a bare checkbox is never on screen. Bootstrap's checked
+// state is a white tick drawn as a `background-image`, which on a transparent
+// fill is a white tick on a white dialog: invisible both ways.
+//
+// Fixed here rather than by editing `_reset.scss`, for the same reason as
+// `crud-table.scss`: ported Cuba pages keep the template's behaviour unless
+// they opt in with a class of ours.
+//
+// Specificity: Cuba's rule is `.form-check-input[type='checkbox']` (0,2,0), so
+// the extra class below (0,3,0) wins without `!important`.
+
+.hf-check-grid {
+  // Comfortable hit targets in a wrapping row — seven weekdays on one line at
+  // dialog width, two lines on a narrow screen.
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  padding-top: 6px;
+
+  .form-check {
+    margin: 0;
+  }
+
+  .form-check-input[type='checkbox'] {
+    width: 16px;
+    height: 16px;
+    margin-top: 0.15em;
+    border: 1px solid $gray-60;
+    border-radius: 3px;
+    background-color: $white;
+    cursor: pointer;
+
+    &:checked {
+      border-color: var(--theme-deafult);
+      // The tick is Bootstrap's white SVG background-image, so the fill has to
+      // be the accent for it to read at all.
+      background-color: var(--theme-deafult);
+    }
+
+    &:focus-visible {
+      outline: 2px solid rgba($primary-color, 0.35);
+      outline-offset: 1px;
+    }
+  }
+
+  .form-check-label {
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    user-select: none;
+  }
+}
+
+body.dark-only .hf-check-grid {
+  .form-check-input[type='checkbox'] {
+    border-color: rgba($white, 0.25);
+    background-color: transparent;
+
+    &:checked {
+      border-color: var(--theme-deafult);
+      background-color: var(--theme-deafult);
+    }
+  }
+
+  .form-check-label {
+    color: $dark-all-font-color;
+  }
+}
