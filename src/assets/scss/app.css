@@ -40054,7 +40054,7 @@ html[dir=rtl] .social-chat .other-msg {
 html[dir=rtl] .social-chat .media-body:before {
   left: 100%;
   right: unset;
-  border-left: 7px solid var(-semi-dark);
+  border-left: 7px solid #59667a;
   border-right: unset;
 }
 html[dir=rtl] .social-chat .media-body:after {

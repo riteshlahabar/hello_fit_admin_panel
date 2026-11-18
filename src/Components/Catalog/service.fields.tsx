@@ -1,12 +1,12 @@
-// The Add Service dialog's fields, kept out of `Services.tsx` so neither file
+// The Add / Edit Service dialog fields, kept out of `Services.tsx` so neither
 // grows past the project's 200-line limit.
 //
 // Shape agreed before building (standing rule): Category, Name, Duration,
 // Base price, Level, Allow group + Max participants, Home service,
 // Description, Inclusions, Active.
 //
-// Everything here is **create-only**. The API has no service edit route — the
-// provider owns the wording (§4.5) — so the dialog is only ever used to add.
+// The Add / Edit dialog uses the same fields — the service edit route
+// landed 18 Nov 2026 (client), so nothing here is create-only.
 
 import type { FieldDef } from '../Common/CrudPage';
 import type { CatalogService } from '../../Services/catalog.api';

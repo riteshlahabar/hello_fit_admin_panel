@@ -34,6 +34,11 @@ export interface CatalogService {
   categoryId: string;
   durationMin: number;
   basePrice: string;
+  allowMultiPerson: boolean;
+  maxParticipants: number;
+  isHomeService: boolean;
+  description: string | null;
+  inclusions: string | null;
   level: string;
   isActive: boolean;
   category?: { id: string; name: string; isActive: boolean };
@@ -66,11 +71,16 @@ export const catalogApi = {
       ),
     /**
      * Adding a service (client instruction, 18 Nov 2026) — past §4.5, which
-     * gives the provider its own services. There is still no **edit**: only
-     * creation and the rate card were asked for.
+     * gives the provider its own services — as the edit route below is.
      */
     create: (body: Record<string, unknown>) =>
       api.post<CatalogService>(`${BASE}/services`, body),
+    /**
+     * Editing a service (client instruction, 18 Nov 2026). Same fields as the
+     * Add form, `allowMultiPerson` included — nothing else could change it.
+     */
+    update: (id: string, body: Record<string, unknown>) =>
+      api.patch<CatalogService>(`${BASE}/services/${id}`, body),
     /**
      * Hard delete (client, 18 Nov 2026), refused while a booking, session,
      * trainer link or commission rule points at it — the API's message names

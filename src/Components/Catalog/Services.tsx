@@ -141,6 +141,7 @@ const Services = () => {
       fields={fields}
       load={load}
       create={catalogApi.services.create}
+      update={catalogApi.services.update}
       remove={catalogApi.services.remove}
       deleteVerb='Delete'
       inactiveLabel='Show hidden'
