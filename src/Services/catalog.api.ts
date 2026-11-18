@@ -52,6 +52,8 @@ export const catalogApi = {
       listed<Category>(await api.get<Category[]>(`${BASE}/categories${qs(query)}`)),
     create: (body: Record<string, unknown>) =>
       api.post<Category>(`${BASE}/categories`, body),
+    /** Hard delete; refused while the category still holds services. */
+    remove: (id: string) => api.delete(`${BASE}/categories/${id}`),
     /** Also the activate / deactivate call — `isActive` is a field on it. */
     update: (id: string, body: Record<string, unknown>) =>
       api.patch<Category>(`${BASE}/categories/${id}`, body),
@@ -69,6 +71,12 @@ export const catalogApi = {
      */
     create: (body: Record<string, unknown>) =>
       api.post<CatalogService>(`${BASE}/services`, body),
+    /**
+     * Hard delete (client, 18 Nov 2026), refused while a booking, session,
+     * trainer link or commission rule points at it — the API's message names
+     * the counts, so the toast tells the admin what to clear first.
+     */
+    remove: (id: string) => api.delete(`${BASE}/services/${id}`),
     setVisibility: (id: string, isActive: boolean) =>
       api.post<CatalogService & { upcomingBookings: number }>(
         `${BASE}/services/${id}/visibility`,

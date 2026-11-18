@@ -84,6 +84,8 @@ export const pricingApi = {
       api.post<Package>(PACKAGES, weekdaysBody(body)),
     update: (id: string, body: Record<string, unknown>) =>
       api.patch<Package>(`${PACKAGES}/${id}`, weekdaysBody(body)),
+    /** Hard delete; refused while a booking points at the package. */
+    remove: (id: string) => api.delete(`${PACKAGES}/${id}`),
     /** Reports the booking count in its message when deactivating. */
     setStatus: (id: string, isActive: boolean) =>
       api.patch<Package>(`${PACKAGES}/${id}/status`, { isActive }),
@@ -99,6 +101,8 @@ export const pricingApi = {
       api.patch<GroupSlab>(`${SLABS}/${id}`, { percentOff: body.percentOff }),
     setStatus: (id: string, isActive: boolean) =>
       api.patch<GroupSlab>(`${SLABS}/${id}/status`, { isActive }),
+    /** Nothing stores a slab, so the delete always goes through. */
+    remove: (id: string) => api.delete(`${SLABS}/${id}`),
   },
 
   trainerCategories: {

@@ -12,8 +12,9 @@
 // `basePrice`; the same -15% serves every service in the catalogue. The API
 // rejects a `price` in the body, so there is deliberately no such field here.
 //
-// No delete: a booking keeps its `packageId` and the invoice behind it must
-// stay explicable. Inactive is how a package leaves the dropdown.
+// **Delete is hard (18 Nov) but refused while a booking points at the row** —
+// the invoice behind it must stay explicable. Inactive is how a used package
+// leaves the dropdown.
 
 import { useCallback } from 'react';
 import StatusBadge from '../Common/StatusBadge';
@@ -145,6 +146,7 @@ const Packages = () => {
       load={load}
       create={pricingApi.packages.create}
       update={pricingApi.packages.update}
+      remove={pricingApi.packages.remove}
       inactiveLabel='Show inactive'
       actionsWidth='210px'
       rowActions={(row, refresh) => (

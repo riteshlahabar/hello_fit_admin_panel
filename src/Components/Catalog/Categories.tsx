@@ -91,6 +91,7 @@ const Categories = () => {
       load={load}
       create={catalogApi.categories.create}
       update={catalogApi.categories.update}
+      remove={catalogApi.categories.remove}
       inactiveLabel='Show inactive'
       actionsWidth='160px'
     />

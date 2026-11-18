@@ -6,7 +6,9 @@
 // gives the *provider* the service's name, description and pricing. The
 // client asked for an **Add Service** button on 18 Nov 2026, so creation goes
 // past 4.5 the same way admin-only pricing did on 17 Nov. Editing and
-// deleting were not asked for and the API has no route for either.
+// editing was not asked for and the API has no route for it. **Delete is
+// there since 18 Nov** — hard, and refused by the API while a booking,
+// session, trainer link or commission rule points at the service.
 //
 // Hiding does not cancel anything. The API reports how many sessions are
 // already booked against the service and the message says they are unaffected.
@@ -139,8 +141,9 @@ const Services = () => {
       fields={fields}
       load={load}
       create={catalogApi.services.create}
+      remove={catalogApi.services.remove}
       inactiveLabel='Show hidden'
-      actionsWidth='120px'
+      actionsWidth='210px'
       rowActions={(row, refresh) => (
         <VisibilityButton service={row} onDone={refresh} />
       )}

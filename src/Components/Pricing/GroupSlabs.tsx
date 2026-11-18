@@ -84,6 +84,7 @@ const GroupSlabs = () => {
       load={load}
       create={pricingApi.groupSlabs.create}
       update={pricingApi.groupSlabs.update}
+      remove={pricingApi.groupSlabs.remove}
       hasSearch={false}
       inactiveLabel='Show inactive'
       actionsWidth='200px'
