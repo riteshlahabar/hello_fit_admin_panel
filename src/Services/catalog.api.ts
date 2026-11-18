@@ -2,10 +2,10 @@
 // hello_fit_backend/src/modules/catalog/dto/admin-catalog.dto.ts.
 //
 // PDF 6.5 is asymmetric and so is this: the admin **owns categories** (create,
-// edit, describe, activate/deactivate) but only **reviews services** and
-// controls their visibility. 4.5 gives the provider its service's name,
-// description and pricing, so there is no create, edit or delete for a service
-// here — adding one would invent authority the PDF never grants.
+// edit, describe, activate/deactivate) and over a service has **create** (client
+// instruction, 18 Nov 2026), the rate card (17 Nov) and visibility — but **no
+// edit and no delete**. 4.5 gives the provider its service's wording and both
+// overrides were asked for by name; an edit form was not.
 //
 // No category delete either. 6.5 lists create, edit, activate and deactivate,
 // and nothing more.
@@ -62,7 +62,13 @@ export const catalogApi = {
       listed<CatalogService>(
         await api.get<CatalogService[]>(`${BASE}/services${qs(query)}`),
       ),
-    /** The only administrative lever on a service. */
+    /**
+     * Adding a service (client instruction, 18 Nov 2026) — past §4.5, which
+     * gives the provider its own services. There is still no **edit**: only
+     * creation and the rate card were asked for.
+     */
+    create: (body: Record<string, unknown>) =>
+      api.post<CatalogService>(`${BASE}/services`, body),
     setVisibility: (id: string, isActive: boolean) =>
       api.post<CatalogService & { upcomingBookings: number }>(
         `${BASE}/services/${id}/visibility`,

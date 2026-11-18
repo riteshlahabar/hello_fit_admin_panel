@@ -1,16 +1,17 @@
 // Provider services — review and visibility (PDF 6.5) —
 // /admin/catalog/services on the API.
 //
-// **Read-only except for one switch.** 6.5 gives the administrator "review
-// provider service information" and "manage permitted service visibility";
-// 4.5 gives the *provider* the service's name, description and pricing. So
-// there is no Add, no Edit and no Delete here, and the API has no route for
-// any of them — the single row action is Show / Hide.
+// **Add and hide, but no edit.** 6.5 gives the administrator "review provider
+// service information" and "manage permitted service visibility", and 4.5
+// gives the *provider* the service's name, description and pricing. The
+// client asked for an **Add Service** button on 18 Nov 2026, so creation goes
+// past 4.5 the same way admin-only pricing did on 17 Nov. Editing and
+// deleting were not asked for and the API has no route for either.
 //
 // Hiding does not cancel anything. The API reports how many sessions are
 // already booked against the service and the message says they are unaffected.
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Input } from 'reactstrap';
 import { toast } from 'react-toastify';
 import { Btn } from '../../AbstractElements';
@@ -22,6 +23,7 @@ import {
   fetchCategoryOptions,
   type CatalogService,
 } from '../../Services/catalog.api';
+import { serviceFields } from './service.fields';
 
 const columns: ColumnDef<CatalogService>[] = [
   {
@@ -125,15 +127,18 @@ const Services = () => {
     [categoryId],
   );
 
+  // The dialog's category dropdown is the same live list as the filter's.
+  const fields = useMemo(() => serviceFields(categories), [categories]);
+
   return (
     <CrudPage<CatalogService>
       title='Services'
       singular='Service'
       parent='Catalog'
       columns={columns}
-      fields={[]}
+      fields={fields}
       load={load}
-      canCreate={false}
+      create={catalogApi.services.create}
       inactiveLabel='Show hidden'
       actionsWidth='120px'
       rowActions={(row, refresh) => (

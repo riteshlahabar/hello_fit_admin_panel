@@ -31,7 +31,9 @@ import Earnings from '../Components/Earnings/Earnings';
 import Categories from '../Components/Catalog/Categories';
 import Services from '../Components/Catalog/Services';
 import Coupons from '../Components/Marketing/Coupons';
-import Plans from '../Components/Plans/Plans';
+import Packages from '../Components/Pricing/Packages';
+import GroupSlabs from '../Components/Pricing/GroupSlabs';
+import TrainerCategories from '../Components/Pricing/TrainerCategories';
 import {
   AccountsReportPage,
   BookingsReportPage,
@@ -70,8 +72,12 @@ export const routes: AppRoute[] = [
 
   // Marketing — PDF 6.9 Coupons and Promotional Settings.
   { path: `/marketing/coupons`, Component: <Coupons /> },
-  // Membership plans — client instruction, 13 Nov 2026 (not in the v3 PDF).
-  { path: `/marketing/plans`, Component: <Plans /> },
+  // Pricing — the client's pricing doc, 17 Nov 2026. Packages took the slot
+  // membership plans had: the client reads "plan" as "package", and the plan
+  // module is gone from the backend. → state/pricing-rules.md
+  { path: `/marketing/packages`, Component: <Packages /> },
+  { path: `/marketing/group-slabs`, Component: <GroupSlabs /> },
+  { path: `/marketing/trainer-categories`, Component: <TrainerCategories /> },
 
   // Reports — PDF 6.12. One route per report, no export (6.12 gates it) and
   // no Summary page (charts are not in the PDF — parked for the client).
