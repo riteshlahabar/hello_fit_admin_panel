@@ -103,7 +103,8 @@ export async function fetchCategoryOptions() {
  * which of four trainer tiers the admin is ticking.
  */
 export async function fetchServiceOptions() {
-  const result = await catalogApi.services.list({ limit: 200 });
+  // `limit` is capped at 100 by the API — 200 is a 400 and an empty dropdown.
+  const result = await catalogApi.services.list({ limit: 100 });
   if (!result.ok) return [];
   return result.value.rows.map((s) => ({
     value: s.id,
