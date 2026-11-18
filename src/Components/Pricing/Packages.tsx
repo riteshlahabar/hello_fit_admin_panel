@@ -147,6 +147,7 @@ const Packages = () => {
       create={pricingApi.packages.create}
       update={pricingApi.packages.update}
       remove={pricingApi.packages.remove}
+      deleteVerb='Delete'
       inactiveLabel='Show inactive'
       actionsWidth='210px'
       rowActions={(row, refresh) => (

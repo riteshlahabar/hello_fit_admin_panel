@@ -92,6 +92,7 @@ const Categories = () => {
       create={catalogApi.categories.create}
       update={catalogApi.categories.update}
       remove={catalogApi.categories.remove}
+      deleteVerb='Delete'
       inactiveLabel='Show inactive'
       actionsWidth='160px'
     />

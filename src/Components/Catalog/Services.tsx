@@ -142,6 +142,7 @@ const Services = () => {
       load={load}
       create={catalogApi.services.create}
       remove={catalogApi.services.remove}
+      deleteVerb='Delete'
       inactiveLabel='Show hidden'
       actionsWidth='210px'
       rowActions={(row, refresh) => (
