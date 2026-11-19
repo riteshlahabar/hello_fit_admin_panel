@@ -545,7 +545,14 @@ const CrudPage = <T extends { id: string }>({
         </Row>
       </Container>
 
-      <Modal className='fade show' size='lg' isOpen={open} toggle={toggle}>
+      {/* `hf-crud-dialog` caps the body's height and pins the buttons to its
+          foot — the Package form is thirteen fields and ran off the bottom of
+          a laptop screen (client, 19 Nov 2026). → styles/crud-dialog.scss */}
+      <Modal
+        className='fade show hf-crud-dialog'
+        size='lg'
+        isOpen={open}
+        toggle={toggle}>
         <div className='modal-header'>
           <H5 attrH5={{ className: 'modal-title' }}>
             {editing ? `Edit ${singular}` : `Add ${singular}`}
@@ -558,7 +565,7 @@ const CrudPage = <T extends { id: string }>({
             aria-label='Close'
           />
         </div>
-        <ModalBody style={{ padding: '24px' }}>
+        <ModalBody>
           <Form className='needs-validation' onSubmit={onSubmit}>
             <div className='form-row row'>
               {fields
@@ -589,7 +596,12 @@ const CrudPage = <T extends { id: string }>({
                       <>
                         <Label for={f.name}>
                           {f.label}
-                          {f.required ? ' *' : ''}
+                          {/* Not `.txt-danger` — Cuba defines that only in a
+                              prebuilt stylesheet the panel does not compile,
+                              so it resolves to nothing. → crud-dialog.scss */}
+                          {f.required ? (
+                            <span className='hf-required'> *</span>
+                          ) : null}
                         </Label>
                         {f.type === 'checkboxes' ? (
                           // A row of checkboxes over a fixed, small set — the
@@ -645,7 +657,14 @@ const CrudPage = <T extends { id: string }>({
                             type='select'
                             multiple
                             id={f.name}
-                            style={{ height: 'auto', minHeight: '140px' }}
+                            // Native `required` on a multi-select is "no
+                            // option chosen", which is exactly the rule the
+                            // Package dialog's Services needs (client, 19 Nov
+                            // 2026) — and the API refuses an empty list too.
+                            required={f.required}
+                            // 108px shows five rows; 140 showed seven and was
+                            // the tallest single thing in the dialog.
+                            style={{ height: 'auto', minHeight: '108px' }}
                             value={picked(form[f.name])}
                             onChange={(e) => {
                               // reactstrap types every Input target as an
@@ -711,19 +730,21 @@ const CrudPage = <T extends { id: string }>({
                   </FormGroup>
                 ))}
             </div>
-            <Btn
-              attrBtn={{ color: 'primary', type: 'submit', disabled: saving }}>
-              {saving ? 'Saving…' : 'Save'}
-            </Btn>
-            <Btn
-              attrBtn={{
-                color: 'secondary',
-                className: 'm-l-5',
-                type: 'button',
-                onClick: toggle,
-              }}>
-              Cancel
-            </Btn>
+            <div className='hf-dialog-actions'>
+              <Btn
+                attrBtn={{ color: 'primary', type: 'submit', disabled: saving }}>
+                {saving ? 'Saving…' : 'Save'}
+              </Btn>
+              <Btn
+                attrBtn={{
+                  color: 'secondary',
+                  className: 'm-l-5',
+                  type: 'button',
+                  onClick: toggle,
+                }}>
+                Cancel
+              </Btn>
+            </div>
           </Form>
         </ModalBody>
       </Modal>

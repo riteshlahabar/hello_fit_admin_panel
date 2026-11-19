@@ -3,15 +3,25 @@
 //
 // Shape agreed before building (standing rule): Name, Icon, Category,
 // Services, Sessions, Persons, Free sessions, Validity, Percent adjust,
-// Allowed weekdays, Fixed trainer, Sort order, Active.
+// Sort order, Allowed weekdays, Fixed trainer, Active.
 //
 // **Services and Persons both landed 18 Nov 2026** (client): a package names
 // the services it is sold on and carries its own head count, which is what
 // replaced Group Slabs. → state/pricing-rules.md
 //
-// **Category is a filter, not a field** (client, 18 Nov 2026): it narrows the
+// **Category is a filter, not a field** (client, 18 Nov 2026): it picks the
 // Services list and is `transient`, so it never reaches the API — which runs
 // `forbidNonWhitelisted` and would refuse it. Weekdays are seven checkboxes.
+//
+// **Both are compulsory and the Services list is empty until a category is
+// picked** (client, 19 Nov 2026). Compulsory on the API too: `serviceIds` is
+// required with at least one id on create. → admin-package.dto.ts
+//
+// **Help text dropped from Icon, Category, Sessions, Persons and Free
+// sessions** (client, 19 Nov 2026): the labels say it, and five extra lines
+// were a third of the dialog's height. The three that remain each carry a
+// rule the label cannot — how to multi-pick, what the sign means, and what no
+// weekday ticked means.
 
 import type { FieldDef, FieldOption } from '../Common/CrudPage';
 import type { Package } from '../../Services/pricing.api';
@@ -46,7 +56,6 @@ export function packageFields(
       name: 'icon',
       label: 'Icon / symbol',
       placeholder: '🔥',
-      help: 'One emoji or symbol, shown on the package card. Leave empty for the default mark.',
       readValue: (row) => row.icon ?? '',
     },
     {
@@ -55,19 +64,30 @@ export function packageFields(
       type: 'select',
       options: categories,
       transient: true,
-      help: 'Narrows the Services list below. Leave empty to see every service.',
+      required: true,
+      // Transient, so an edit has nothing stored to read back. Derived from
+      // the row's first service instead, or the Services list would open
+      // empty on a package that plainly has services.
+      readValue: (row) => {
+        const first = (row.services ?? [])[0];
+        return services.find((s) => s.value === first?.id)?.categoryId ?? '';
+      },
     },
     {
       name: 'serviceIds',
       label: 'Services',
       type: 'multiselect',
-      // Narrowed by the Category above; empty category means the lot.
+      required: true,
+      // Empty until a category is picked (client, 19 Nov 2026). Showing the
+      // whole catalogue up front made the Category field pointless and the
+      // list too long to read.
       options: (form) =>
-        services.filter(
-          (s) => !form.categoryFilter || s.categoryId === form.categoryFilter,
-        ),
-      wide: true,
-      help: 'Ctrl / Cmd-click to pick several. A package with no service ticked is sold nowhere.',
+        form.categoryFilter
+          ? services.filter((s) => s.categoryId === form.categoryFilter)
+          : [],
+      // Half-width, beside Category (client, 19 Nov 2026) — full width made
+      // the box far wider than the longest service name.
+      help: 'Ctrl / Cmd-click to pick several. Pick a category above to fill this list.',
       readValue: (row) => (row.services ?? []).map((s) => s.id).join(','),
     },
     {
@@ -76,7 +96,6 @@ export function packageFields(
       type: 'number',
       required: true,
       defaultValue: 1,
-      help: 'Sessions the customer pays for.',
     },
     {
       name: 'persons',
@@ -84,14 +103,12 @@ export function packageFields(
       type: 'number',
       required: true,
       defaultValue: 1,
-      help: 'The rate is per person, so this multiplies the price. Above 1 makes it a group package.',
     },
     {
       name: 'freeSessionCount',
       label: 'Free sessions',
       type: 'number',
       defaultValue: 0,
-      help: 'Delivered on top, charged to nobody and paid to nobody — the trial is 1 + 1.',
     },
     {
       name: 'validityDays',
@@ -107,6 +124,9 @@ export function packageFields(
       defaultValue: 0,
       help: 'Signed, applied to rate x persons x sessions. +20 is the trial markup, -20 a group discount.',
     },
+    // Paired with Percent adjust on one row (client, 19 Nov 2026): two plain
+    // numbers, and Percent was sitting alone next to the full-width weekdays.
+    { name: 'sortOrder', label: 'Sort order', type: 'number', defaultValue: 0 },
     {
       name: 'allowedWeekdays',
       label: 'Allowed weekdays',
@@ -122,7 +142,6 @@ export function packageFields(
       type: 'checkbox',
       defaultValue: true,
     },
-    { name: 'sortOrder', label: 'Sort order', type: 'number', defaultValue: 0 },
     {
       // Status moves through its own audited route once the row exists, so the
       // checkbox is only offered while creating.

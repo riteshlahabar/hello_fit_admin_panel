@@ -17,6 +17,10 @@
 // dialog's weekdays showed their labels and no boxes. See the file.
 @import './styles/form-checks.scss';
 
+// Ours. The Add / Edit dialog on every CrudPage — tighter rhythm and a capped,
+// scrolling body, so the thirteen-field Package form fits a laptop. See the file.
+@import './styles/crud-dialog.scss';
+
 // Ours. Cuba's collapsed sidebar expands again on hover, and its toggle sits
 // inside that hover area, so clicking looked like it did nothing. See the file.
 @import './styles/sidebar-toggle.scss';

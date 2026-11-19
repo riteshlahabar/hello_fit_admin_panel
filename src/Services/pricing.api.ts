@@ -70,7 +70,9 @@ function weekdaysBody(body: Record<string, unknown>): Record<string, unknown> {
 
 /**
  * The services multi-select arrives comma-joined from the dialog. An empty
- * value is kept, not dropped: it means "sold nowhere" (client, 18 Nov 2026).
+ * value is still sent rather than dropped — the API refuses `[]` now that one
+ * service is compulsory (client, 19 Nov 2026), and dropping it on a PATCH
+ * would silently leave the old links in place instead.
  */
 function packageBody(body: Record<string, unknown>): Record<string, unknown> {
   const withDays = weekdaysBody(body);

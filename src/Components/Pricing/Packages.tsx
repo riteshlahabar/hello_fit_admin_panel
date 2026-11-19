@@ -13,7 +13,9 @@
 //
 // **It names the services it is sold on and carries its own `persons`**
 // (client, 18 Nov 2026) — that pair replaced Group Slabs, which is deleted.
-// A package with no service ticked is sold nowhere.
+// **Category and Services are both compulsory** (client, 19 Nov 2026), so new
+// rows always name a service; the "Sold nowhere" badge below is for rows
+// created before that rule.
 //
 // **Delete is hard (18 Nov) but refused while a booking points at the row** —
 // the invoice behind it must stay explicable. Inactive is how a used package

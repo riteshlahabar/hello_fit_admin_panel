@@ -1,0 +1,76 @@
+// The CrudPage Add / Edit dialog's height — client, 19 Nov 2026: "decrease
+// the height of overall popup of add package and also do for edit package".
+//
+// The Package dialog is the tallest of them: thirteen fields in two columns,
+// most carrying a line of help text, plus a multi-select. At Cuba's stock
+// `FormGroup` spacing that ran past the bottom of a 900px screen, and the
+// Save button went with it.
+//
+// Two parts, and the second is why this is a class of ours rather than an
+// edit to Cuba's `components/_modal.scss`: ported Cuba pages keep the
+// template's spacing unless they opt in (same reasoning as `crud-table.scss`).
+//
+//   1. Tighter vertical rhythm — the help text is a 12px line that does not
+//      need a full `FormGroup` gap under it.
+//   2. A capped, scrolling body with the buttons pinned to its foot, so the
+//      dialog can never grow taller than the viewport and Save is always
+//      reachable without scrolling.
+
+// The star on a compulsory field's label (client, 19 Nov 2026: Category and
+// Services on the Package dialog). Its own class because Cuba's `.txt-danger`
+// lives in a prebuilt stylesheet the panel does not compile.
+.hf-required {
+  color: $danger-color;
+  font-weight: 600;
+}
+
+.hf-crud-dialog {
+  .modal-body {
+    padding: 18px 20px 0;
+    // Header (~60px) plus the dialog's own top and bottom margins.
+    max-height: calc(100vh - 150px);
+    overflow-y: auto;
+  }
+
+  // Cuba's own is 1rem; the help line already separates one field from the
+  // next, so two thirds of it reads the same and saves ~70px over seven rows.
+  .form-row > .form-group {
+    margin-bottom: 11px;
+  }
+
+  label {
+    margin-bottom: 4px;
+  }
+
+  // Help text sits right under its input rather than floating a line below.
+  .f-12 {
+    display: block;
+    margin-top: 2px;
+    line-height: 1.3;
+  }
+
+  // The weekdays row: `form-checks.scss` pads it to clear a label that this
+  // dialog has already tightened.
+  .hf-check-grid {
+    padding-top: 2px;
+    gap: 7px 18px;
+  }
+
+  // The lone switch field (`Active`, `Fixed trainer allowed`) is pushed down
+  // by `mt-4` to line up with a labelled input beside it. At this spacing it
+  // only needs the height of the label it is standing in for.
+  .form-switch.mt-4 {
+    margin-top: 1.55rem !important;
+  }
+}
+
+// Pinned to the foot of the scrolling body, so Save is on screen whatever the
+// field count. Full-bleed over the body's 20px side padding.
+.hf-dialog-actions {
+  position: sticky;
+  bottom: 0;
+  margin: 6px -20px 0;
+  padding: 14px 20px;
+  background-color: var(--bs-modal-bg, var(--bs-body-bg));
+  border-top: 1px solid var(--bs-border-color);
+}
