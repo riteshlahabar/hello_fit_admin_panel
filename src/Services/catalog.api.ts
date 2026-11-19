@@ -34,6 +34,8 @@ export interface CatalogService {
   categoryId: string;
   durationMin: number;
   basePrice: string;
+  /** Trainer's cut as a percent. Compulsory since 19-11-2026. */
+  commissionPct: string;
   description: string | null;
   isActive: boolean;
   category?: { id: string; name: string; isActive: boolean };

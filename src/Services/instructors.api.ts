@@ -49,6 +49,12 @@ export interface Instructor {
   experienceYears: number;
   languages: string[];
   specialisations: string[];
+  /** The wizard's professional and address pages (added 19-11-2026). */
+  qualification: string | null;
+  institute: string | null;
+  city: string | null;
+  /** Per-provider commission override as a percent; null uses the service's. */
+  commissionPct: string | null;
   sessionFormats: SessionFormat[];
   branchId: string | null;
   dailySessionCap: number;

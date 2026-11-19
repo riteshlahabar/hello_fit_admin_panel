@@ -52,6 +52,7 @@ const columns: ColumnDef<CatalogService>[] = [
   },
   { header: 'Duration', cell: (r) => `${r.durationMin} min` },
   { header: 'Price', cell: (r) => `₹${Number(r.basePrice).toFixed(2)}` },
+  { header: 'Commission', cell: (r) => `${Number(r.commissionPct).toFixed(2)}%` },
   { header: 'Bookings', cell: (r) => r._count?.bookings ?? 0 },
   {
     header: 'Visibility',

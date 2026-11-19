@@ -1,17 +1,19 @@
-// Typed calls for the two pricing menus — /admin/packages and
-// /admin/trainer-categories.
+// Typed calls for the pricing menu — /admin/packages.
 //
-// Admin sets every price and a provider never does (client, 17 Nov 2026), so
-// unlike the Services screen these are full CRUD. Two shapes they share:
+// Admin sets every price and a provider never does (client, 17-11-2026), so
+// unlike the Services screen this is full CRUD. Two shapes to know:
 //
 //   * **Status is its own route** (`PATCH :id/status`), not a field on the
-//     edit body — which is why the screens pass a `rowActions` button rather
+//     edit body — which is why the screen passes a `rowActions` button rather
 //     than an Active checkbox on the dialog when editing.
 //   * A package holds a **percent**, never a price. The money is
 //     `Service.basePrice`: base x persons x sessions, then the percent.
 //
-// Group Slabs were deleted on 18 Nov 2026 — a group deal is now a package
+// Group Slabs were deleted on 18-11-2026 — a group deal is now a package
 // with `persons` above 1, sold on the services the admin ticks.
+//
+// Trainer Categories were deleted on 19-11-2026 (client). Commission is now a
+// percent on the service, overridable per provider — not a band.
 // → state/pricing-rules.md
 
 import { api } from './api';
@@ -41,13 +43,6 @@ export interface Package {
 }
 
 
-export interface TrainerCategory {
-  id: string;
-  name: string;
-  sortOrder: number;
-  isActive: boolean;
-  _count?: { instructors: number; commissionRules: number };
-}
 
 /**
  * Weekdays arrive comma-joined from the dialog's seven checkboxes. **No day
@@ -86,7 +81,6 @@ function packageBody(body: Record<string, unknown>): Record<string, unknown> {
 }
 
 const PACKAGES = '/admin/packages';
-const CATEGORIES = '/admin/trainer-categories';
 
 export const pricingApi = {
   packages: {
@@ -103,17 +97,4 @@ export const pricingApi = {
       api.patch<Package>(`${PACKAGES}/${id}/status`, { isActive }),
   },
 
-  trainerCategories: {
-    list: async (query: ListQuery = {}) =>
-      listed<TrainerCategory>(
-        await api.get<TrainerCategory[]>(`${CATEGORIES}${qs(query)}`),
-      ),
-    create: (body: Record<string, unknown>) =>
-      api.post<TrainerCategory>(CATEGORIES, body),
-    update: (id: string, body: Record<string, unknown>) =>
-      api.patch<TrainerCategory>(`${CATEGORIES}/${id}`, body),
-    /** Refused while providers or live commission rules point at the band. */
-    setStatus: (id: string, isActive: boolean) =>
-      api.patch<TrainerCategory>(`${CATEGORIES}/${id}/status`, { isActive }),
-  },
 };

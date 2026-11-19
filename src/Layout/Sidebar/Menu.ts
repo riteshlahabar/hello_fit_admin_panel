@@ -204,13 +204,6 @@ export const MENUITEMS: MenuGroup[] = [
         path: '/marketing/packages',
         active: false,
       },
-      {
-        title: 'Trainer Categories',
-        icon: 'charts',
-        type: 'link',
-        path: '/marketing/trainer-categories',
-        active: false,
-      },
     ],
   },
   {

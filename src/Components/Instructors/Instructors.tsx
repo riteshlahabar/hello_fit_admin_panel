@@ -70,6 +70,29 @@ const columns: ColumnDef<Instructor>[] = [
       </StatusBadge>
     ),
   },
+  // The four the client asked for on 19-11-2026, so a reviewer can judge an
+  // applicant from the list instead of opening each file.
+  {
+    header: 'Experience',
+    cell: (r) => (r.experienceYears > 0 ? `${r.experienceYears} yr` : '—'),
+  },
+  {
+    header: 'Qualification',
+    cell: (r) => (
+      <div>
+        <div>{r.qualification || '—'}</div>
+        {r.institute ? (
+          <span className='f-light f-12'>{r.institute}</span>
+        ) : null}
+      </div>
+    ),
+  },
+  { header: 'City', cell: (r) => r.city || '—' },
+  {
+    header: 'Specialisations',
+    cell: (r) =>
+      r.specialisations.length > 0 ? r.specialisations.join(', ') : '—',
+  },
   // Null means head office has not assigned one yet; assignment scores
   // distance from the home base, not the branch, so this is not fatal.
   { header: 'Branch', cell: (r) => r.branch?.name ?? 'Unassigned' },

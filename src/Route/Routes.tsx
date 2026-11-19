@@ -32,7 +32,6 @@ import Categories from '../Components/Catalog/Categories';
 import Services from '../Components/Catalog/Services';
 import Coupons from '../Components/Marketing/Coupons';
 import Packages from '../Components/Pricing/Packages';
-import TrainerCategories from '../Components/Pricing/TrainerCategories';
 import {
   AccountsReportPage,
   BookingsReportPage,
@@ -75,7 +74,6 @@ export const routes: AppRoute[] = [
   // membership plans had: the client reads "plan" as "package", and the plan
   // module is gone from the backend. → state/pricing-rules.md
   { path: `/marketing/packages`, Component: <Packages /> },
-  { path: `/marketing/trainer-categories`, Component: <TrainerCategories /> },
 
   // Reports — PDF 6.12. One route per report, no export (6.12 gates it) and
   // no Summary page (charts are not in the PDF — parked for the client).
