@@ -29,8 +29,6 @@ import {
   Col,
   Container,
   DropdownItem,
-  DropdownMenu,
-  DropdownToggle,
   Form,
   FormGroup,
   Input,
@@ -42,12 +40,11 @@ import {
   PaginationLink,
   Row,
   Table,
-  UncontrolledDropdown,
 } from 'reactstrap';
-import { MoreVertical } from 'react-feather';
 import { toast } from 'react-toastify';
 import { Breadcrumbs, Btn, H3, H5 } from '../../AbstractElements';
 import type { Listed, PageMeta } from '../../Services/masters.api';
+import { RowMenu } from './RowMenu';
 
 /** What a `select`, `multiselect` or `checkboxes` field offers. */
 export interface FieldOption {
@@ -474,41 +471,26 @@ const CrudPage = <T extends { id: string }>({
                                 text. `MoreVertical` rather than the `⋮`
                                 character, which renders at whatever weight
                                 the fallback font has. */}
-                            <UncontrolledDropdown>
-                              <DropdownToggle
-                                color='link'
-                                size='sm'
-                                className='hf-row-menu'
-                                aria-label='Row actions'>
-                                <MoreVertical />
-                              </DropdownToggle>
-                              <DropdownMenu end className='hf-row-menu-pop'>
-                                {update ? (
-                                  <DropdownItem
-                                    onClick={() => openEdit(row)}>
-                                    Edit
-                                  </DropdownItem>
-                                ) : null}
-                                {rowActions ? (
-                                  <div className='hf-row-menu-actions'>
-                                    {rowActions(row, () => void refresh())}
-                                  </div>
-                                ) : null}
-                                {remove && (!canDelete || canDelete(row)) ? (
-                                  <Fragment>
-                                    <DropdownItem divider />
-                                    {/* Not `.txt-danger`: Cuba defines that
-                                        only in its prebuilt color.css, which
-                                        the panel does not compile. */}
-                                    <DropdownItem
-                                      className='hf-menu-danger'
-                                      onClick={() => void onDelete(row)}>
-                                      {deleteVerb}
-                                    </DropdownItem>
-                                  </Fragment>
-                                ) : null}
-                              </DropdownMenu>
-                            </UncontrolledDropdown>
+                            <RowMenu
+                              danger={
+                                remove && (!canDelete || canDelete(row))
+                                  ? {
+                                      label: deleteVerb,
+                                      onClick: () => void onDelete(row),
+                                    }
+                                  : undefined
+                              }>
+                              {update ? (
+                                <DropdownItem onClick={() => openEdit(row)}>
+                                  Edit
+                                </DropdownItem>
+                              ) : null}
+                              {rowActions ? (
+                                <div className='hf-row-menu-actions'>
+                                  {rowActions(row, () => void refresh())}
+                                </div>
+                              ) : null}
+                            </RowMenu>
                           </td>
                         </tr>
                       ))
