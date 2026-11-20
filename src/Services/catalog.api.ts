@@ -102,6 +102,11 @@ export async function fetchCategoryOptions() {
 /**
  * Service options for the package screen (client, 18 Nov 2026). `categoryId`
  * rides along so the dialog's Category select can narrow the list.
+ *
+ * `categoryName` rides along too, for the trainer dialog (client, 20 Nov
+ * 2026): a provider's registration categories are stored as `specialisations`,
+ * a `String[]` of category **names**, so matching is by name there and by id
+ * on the package screen.
  */
 export async function fetchServiceOptions() {
   // `limit` is capped at 100 by the API — 200 is a 400 and an empty dropdown.
@@ -111,5 +116,6 @@ export async function fetchServiceOptions() {
     value: s.id,
     label: s.name,
     categoryId: s.categoryId,
+    categoryName: s.category?.name ?? '',
   }));
 }

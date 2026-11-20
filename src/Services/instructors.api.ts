@@ -13,8 +13,9 @@
 // platform — are `instructors:approve`, which the Operations Manager role does
 // not get by default.
 //
-// `PATCH :id` carries only the four ops-owned scheduling fields. The teacher's
-// own bio, languages and specialisations are theirs to edit through
+// `PATCH :id` carries the ops-owned fields only: branch, daily cap, the
+// services this provider may deliver, and the commission override. The
+// teacher's own bio, languages and specialisations are theirs to edit through
 // `/app/instructor/profile`; they are shown here, not edited here.
 
 import { api } from './api';
@@ -69,6 +70,15 @@ export interface Instructor {
   createdAt: string;
   user: { id: string; mobile: string; status: string };
   branch?: { id: string; name: string } | null;
+  /**
+   * The services this provider currently delivers — what the Edit dialog's
+   * Services multi-select starts on (client, 20-11-2026). On the list row
+   * rather than behind the detail call, so opening Edit costs no request.
+   */
+  instructorServices?: {
+    serviceId: string;
+    service: { id: string; name: string };
+  }[];
 }
 
 /** `GET :id` adds the document set and what is blocking approval. */
@@ -78,7 +88,13 @@ export interface InstructorDocument {
   number: string | null;
   verifyStatus: VerifyStatus;
   remarks: string | null;
-  expiresAt: string | null;
+  /**
+   * `expiryDate`, not `expiresAt` — the column's name, and what
+   * `documentView` puts on the wire. Already `dd-mm-yyyy` (hard rule 4):
+   * print it, never put it through `new Date()`.
+   */
+  expiryDate: string | null;
+  issueDate: string | null;
   createdAt: string;
 }
 
@@ -88,12 +104,16 @@ export interface InstructorDocument {
  *
  * `approvedAt` is the switch that puts them on the public website:
  * `provider-visibility.ts` requires at least one approved, active offering
- * before a provider appears in Find a Trainer at all.
+ * before a provider appears in Find a Trainer at all. Since 20-11-2026 it is
+ * written by the Edit dialog's Services multi-select — admin choosing a
+ * service *is* approving it — so there is no publish action any more.
+ *
+ * No `customPrice`: provider-set pricing went on 17-11-2026, and the column
+ * went with it. The rate is `service.basePrice`, whoever delivers the session.
  */
 export interface InstructorOffering {
   id: string;
   level: string;
-  customPrice: string | null;
   isActive: boolean;
   approvedAt: string | null;
   createdAt: string;
@@ -107,13 +127,44 @@ export interface InstructorOffering {
   };
 }
 
+/**
+ * `GET :id` — the whole applicant file, which is what the View dialog renders
+ * (client, 20-11-2026: "show all information there in compact format").
+ *
+ * Every date here arrives already `dd-mm-yyyy` (hard rule 4, formatted by
+ * `instructor-view.ts` on the way out), so the screen prints these strings
+ * and must never put one through `new Date()`.
+ */
 export interface InstructorDetail extends Instructor {
+  bio: string | null;
+  dob: string | null;
+  photoUrl: string | null;
+  /** The wizard's address page. */
+  addressLine: string | null;
+  landmark: string | null;
+  state: string | null;
+  pincode: string | null;
+  country: string | null;
+  clientsTrainedBand: string | null;
+  serviceLocality: string | null;
+  homeBaseLat: string | null;
+  homeBaseLng: string | null;
   offerings: InstructorOffering[];
   documents: InstructorDocument[];
   /** Why `APPROVED` is or is not available, straight from the calculator. */
   approval: { ok: boolean; reasons: string[] };
   allowedStages: OnboardingStage[];
   upcomingSessions: number;
+  /** What the applicant still owes, from the shared onboarding calculator. */
+  onboarding: {
+    progressPercent: number;
+    missingDocuments: string[];
+    unverifiedDocuments: string[];
+    expiredDocuments: string[];
+    missingProfileFields: string[];
+    codeOfConductAccepted: boolean;
+    blockedBy: string[];
+  };
 }
 
 export interface InstructorListQuery extends ListQuery {
@@ -124,6 +175,22 @@ export interface InstructorListQuery extends ListQuery {
 }
 
 const BASE = '/admin/instructors';
+
+/**
+ * The Services multi-select arrives comma-joined from `CrudPage`, which holds
+ * flat form values; the API takes a list of uuids.
+ *
+ * **An empty value is still sent, not dropped.** "No service" is a real
+ * instruction — it takes the provider off the website — and dropping the key
+ * would leave the old selection in place, which is the opposite of what the
+ * admin just did. Same reasoning as `packageBody` in `pricing.api.ts`.
+ */
+function instructorBody(body: Record<string, unknown>): Record<string, unknown> {
+  const raw = body.serviceIds;
+  if (raw === undefined) return body;
+
+  return { ...body, serviceIds: String(raw).split(',').filter(Boolean) };
+}
 
 export const instructorsApi = {
   list: async (query: InstructorListQuery = {}) =>
@@ -156,21 +223,15 @@ export const instructorsApi = {
   changeStage: (id: string, body: { stage: OnboardingStage; reason: string }) =>
     api.post<Instructor>(`${BASE}/${id}/stage`, body),
 
-  /** `instructors:edit`. The four scheduling inputs, nothing else. */
-  update: (id: string, body: Record<string, unknown>) =>
-    api.patch<Instructor>(`${BASE}/${id}`, body),
-
   /**
-   * `instructors:approve`. Publish or unpublish one offering (PDF 6.5).
+   * `instructors:edit`. Branch, daily cap, `serviceIds` and the commission —
+   * nothing else; travel buffer and radius came off on 20-11-2026.
    *
-   * Refused when the service is inactive or the provider's KYC is unverified —
-   * approving into either would publish something nobody can book. The refusal
-   * says which, so the screen can show it.
+   * `serviceIds` is the **whole set**, so an id left out is withdrawn. The API
+   * refuses the lot when one service is retired, and names it.
    */
-  setOfferingApproval: (id: string, serviceId: string, approved: boolean) =>
-    api.post<InstructorOffering>(`${BASE}/${id}/services/${serviceId}/approval`, {
-      approved,
-    }),
+  update: (id: string, body: Record<string, unknown>) =>
+    api.patch<Instructor>(`${BASE}/${id}`, instructorBody(body)),
 
   /** `instructors:approve`. Reports how many sessions need reassigning. */
   changeStatus: (

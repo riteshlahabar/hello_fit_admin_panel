@@ -74,8 +74,13 @@ export interface FieldDef<T> {
    * Options for `select`, `multiselect` and `checkboxes`. A function is given
    * the dialog's current values, so one field can narrow another — the
    * package screen's Category narrowing its Services (client, 18 Nov 2026).
+   *
+   * The row being edited comes second (`undefined` when adding), so a field
+   * can narrow on something the row carries but the form does not — the
+   * trainer screen's Services, shown only for the categories that provider
+   * chose at registration (client, 20 Nov 2026).
    */
-  options?: FieldOption[] | ((form: FormValues) => FieldOption[]);
+  options?: FieldOption[] | ((form: FormValues, row?: T) => FieldOption[]);
   required?: boolean;
   placeholder?: string;
   help?: string;
@@ -164,17 +169,28 @@ export interface CrudPageProps<T extends { id: string }> {
   /** Hide the delete button per row — a built-in role cannot be deleted. */
   canDelete?: (row: T) => boolean;
   /**
-   * Buttons rendered before Edit, for actions the API exposes as their own
+   * Buttons rendered after Edit, for actions the API exposes as their own
    * route. `refresh` re-reads the current page once the action lands.
    */
   rowActions?: (row: T, refresh: () => void) => ReactNode;
+  /**
+   * The read-only panel, rendered **above Edit** (client, 20 Nov 2026: "give
+   * view option above edit"). Its own slot rather than part of `rowActions`
+   * because look-before-you-change is the first thing in the menu, and
+   * `rowActions` sits under Edit.
+   */
+  rowView?: (row: T) => ReactNode;
 }
 
 type FormState = FormValues;
 
-/** A field's options, which may be a function of the other fields. */
-const optionsOf = <T,>(f: FieldDef<T>, form: FormState): FieldOption[] =>
-  typeof f.options === 'function' ? f.options(form) : (f.options ?? []);
+/** A field's options, which may be a function of the other fields and the row. */
+const optionsOf = <T,>(
+  f: FieldDef<T>,
+  form: FormState,
+  row?: T,
+): FieldOption[] =>
+  typeof f.options === 'function' ? f.options(form, row) : (f.options ?? []);
 
 /** Comma-joined ids in the flat form state, as a list again. */
 const picked = (value: string | number | boolean | undefined): string[] =>
@@ -225,6 +241,7 @@ const CrudPage = <T extends { id: string }>({
   canCreate = true,
   canDelete,
   rowActions,
+  rowView,
 }: CrudPageProps<T>) => {
   const [rows, setRows] = useState<T[]>([]);
   const [meta, setMeta] = useState<PageMeta>({
@@ -480,6 +497,11 @@ const CrudPage = <T extends { id: string }>({
                                     }
                                   : undefined
                               }>
+                              {rowView ? (
+                                <div className='hf-row-menu-actions'>
+                                  {rowView(row)}
+                                </div>
+                              ) : null}
                               {update ? (
                                 <DropdownItem onClick={() => openEdit(row)}>
                                   Edit
@@ -596,7 +618,7 @@ const CrudPage = <T extends { id: string }>({
                           // checkbox transparent, so this field showed its
                           // labels and nothing to tick. → form-checks.scss
                           <div className='hf-check-grid'>
-                            {optionsOf(f, form).map((o) => {
+                            {optionsOf(f, form, editing ?? undefined).map((o) => {
                               const on = picked(form[f.name]).includes(o.value);
                               return (
                                 <div
@@ -615,7 +637,7 @@ const CrudPage = <T extends { id: string }>({
                                         if (!on) next.push(o.value);
                                         // Option order, not click order: the
                                         // API reads 0..6 and so does a human.
-                                        const ordered = optionsOf(f, s)
+                                        const ordered = optionsOf(f, s, editing ?? undefined)
                                           .map((opt) => opt.value)
                                           .filter((v) => next.includes(v));
                                         return {
@@ -664,7 +686,7 @@ const CrudPage = <T extends { id: string }>({
                                 [f.name]: chosen.join(','),
                               }));
                             }}>
-                            {optionsOf(f, form).map((o) => (
+                            {optionsOf(f, form, editing ?? undefined).map((o) => (
                               <option key={o.value} value={o.value}>
                                 {o.label}
                               </option>
@@ -683,7 +705,7 @@ const CrudPage = <T extends { id: string }>({
                               }))
                             }>
                             <option value=''>— select —</option>
-                            {optionsOf(f, form).map((o) => (
+                            {optionsOf(f, form, editing ?? undefined).map((o) => (
                               <option key={o.value} value={o.value}>
                                 {o.label}
                               </option>

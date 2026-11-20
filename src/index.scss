@@ -21,6 +21,10 @@
 // scrolling body, so the thirteen-field Package form fits a laptop. See the file.
 @import './styles/crud-dialog.scss';
 
+// Ours. The read-only View dialog — a dense definition grid, because a
+// trainer profile is forty single values. See the file.
+@import './styles/detail-view.scss';
+
 // Ours. Cuba's collapsed sidebar expands again on hover, and its toggle sits
 // inside that hover area, so clicking looked like it did nothing. See the file.
 @import './styles/sidebar-toggle.scss';

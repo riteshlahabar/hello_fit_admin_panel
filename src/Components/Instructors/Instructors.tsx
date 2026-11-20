@@ -1,46 +1,48 @@
 // Teacher recruitment and verification (spec 5.2) — /admin/instructors on the
 // API, the Teacher Manager role's main screen.
 //
-// On Cuba's HoverableRows table and ModalTag dialog, the same shapes the
-// masters, Administration and Customers screens use (../Common/CrudPage).
+// On ../Common/CrudPage, like every other menu.
 //
-// No Add and no delete, because the API has neither route: a teacher creates
-// their own record by applying from the app, and someone who should not be
-// working is blacklisted, not deleted — the sessions, earnings and reviews
-// attached to them have to survive.
+// No Add and no delete, because the API has neither route: a teacher applies
+// from the app, and one who should not be working is blacklisted rather than
+// deleted — their sessions, earnings and reviews have to survive.
 //
-// The Edit dialog carries **only the four ops-owned scheduling numbers** —
-// branch, daily cap, travel buffer, travel radius. Those are the inputs the
-// slot grid and the clash check run on, which is why the teacher may not set
-// them and why their own bio, languages and specialisations are not editable
-// here: `AdminUpdateInstructorDto` has no such fields and the API would refuse
-// the request.
+// The Edit dialog carries the **ops-owned** fields only: branch, the services
+// this provider may deliver, and the daily cap. Their own bio, languages and
+// specialisations are theirs — `AdminUpdateInstructorDto` has no such fields
+// and the API would refuse them. **Travel buffer and radius came off on
+// 20-11-2026** (client); the columns remain, fed by the trainer app and by
+// `scheduling.defaultTravelBufferMin`.
 //
-// **Stage is not a form field either.** `POST :id/stage` is gated on
-// `instructors:approve`, demands a reason, and refuses `APPROVED` while any
-// must-verify document is unverified or expired — naming which one. That
-// refusal is the whole value of the route, so this screen surfaces it rather
-// than trying to predict it; the dialog offers the stages the API said are
-// reachable (`allowedStages` from the detail call), narrowed to Approved and
-// Rejected — the only two decisions admin makes (client, 20-11-2026).
+// **Services is how a provider reaches the website** (PDF 6.5, "manage
+// permitted service visibility"). What is picked here is published — the
+// row-menu publish dialog went with the same instruction — and the options
+// are narrowed to the categories the provider chose at registration, which is
+// what `specialisations` holds.
+//
+// **Stage and documents are not form fields.** Each is its own route with its
+// own permission and its own refusals, so each is a dialog of its own in the
+// row menu: `StageModal.tsx`, `DocumentsModal.tsx`, and `TrainerViewModal.tsx`
+// above Edit. This file is the table and the fields only — the four were one
+// 538-line file until 20-11-2026.
 
 import { Fragment, useCallback, useState } from 'react';
-import { Button, Form, Input, Label, Modal, ModalBody } from 'reactstrap';
-import { toast } from 'react-toastify';
-import { Btn, H5 } from '../../AbstractElements';
+import { Input } from 'reactstrap';
 import StatusBadge from '../Common/StatusBadge';
-import OfferingsModal from './OfferingsModal';
+import TrainerViewModal from './TrainerViewModal';
+import DocumentsModal from './DocumentsModal';
+import StageModal from './StageModal';
 import CrudPage from '../Common/CrudPage';
 import type { BadgeTone } from '../Common/StatusBadge';
 import type { ColumnDef, FieldDef } from '../Common/CrudPage';
 import {
   instructorsApi,
-  DECIDABLE_STAGES,
   ONBOARDING_STAGES,
   type Instructor,
   type OnboardingStage,
 } from '../../Services/instructors.api';
 import { useBranchOptions } from '../Masters/useCityOptions';
+import { useTrainerServiceOptions } from './useTrainerServiceOptions';
 
 const STAGE_TONE: Record<OnboardingStage, BadgeTone> = {
   APPLIED: 'light-secondary',
@@ -72,8 +74,8 @@ const columns: ColumnDef<Instructor>[] = [
       </StatusBadge>
     ),
   },
-  // The four the client asked for on 19-11-2026, so a reviewer can judge an
-  // applicant from the list instead of opening each file.
+  // The four the client asked for on 19-11-2026, to judge an applicant from
+  // the list instead of opening each file.
   {
     header: 'Experience',
     cell: (r) => (r.experienceYears > 0 ? `${r.experienceYears} yr` : '—'),
@@ -95,8 +97,7 @@ const columns: ColumnDef<Instructor>[] = [
     cell: (r) =>
       r.specialisations.length > 0 ? r.specialisations.join(', ') : '—',
   },
-  // Null means head office has not assigned one yet; assignment scores
-  // distance from the home base, not the branch, so this is not fatal.
+  // Null is survivable: assignment scores distance from the home base.
   { header: 'Branch', cell: (r) => r.branch?.name ?? 'Unassigned' },
   {
     header: 'Rating',
@@ -107,343 +108,14 @@ const columns: ColumnDef<Instructor>[] = [
   },
 ];
 
-/**
- * `POST :id/stage`. Reads the detail call on open rather than in an effect
- * keyed on the row: the table renders one of these per row, so an effect would
- * fire a detail request for every row on every page load.
- */
-const StageModal = ({
-  instructor,
-  onDone,
-}: {
-  instructor: Instructor;
-  onDone: () => void;
-}) => {
-  const [open, setOpen] = useState(false);
-  const [allowed, setAllowed] = useState<OnboardingStage[]>([]);
-  const [blockers, setBlockers] = useState<string[]>([]);
-  const [stage, setStage] = useState<OnboardingStage>(
-    instructor.onboardingStage,
-  );
-  const [reason, setReason] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
-
-  const toggle = async () => {
-    if (open) {
-      setOpen(false);
-      return;
-    }
-    setStage(instructor.onboardingStage);
-    setReason('');
-    setOpen(true);
-    setLoading(true);
-    const result = await instructorsApi.get(instructor.id);
-    setLoading(false);
-    if (result.ok) {
-      const reachable = result.data.allowedStages ?? [];
-      setAllowed(reachable);
-      // The select only lists Approved and Rejected, so the current stage is
-      // usually not among them — start on the first option actually shown, or
-      // submit would post a stage nobody chose.
-      const offered = DECIDABLE_STAGES.filter((s) => reachable.includes(s));
-      if (offered.length > 0 && !offered.includes(instructor.onboardingStage)) {
-        setStage(offered[0]);
-      }
-      setBlockers(result.data.approval?.ok ? [] : (result.data.approval?.reasons ?? []));
-    } else {
-      toast.error(result.error.message);
-    }
-  };
-
-  const offered = ONBOARDING_STAGES.filter(
-    (s) => DECIDABLE_STAGES.includes(s.value) && allowed.includes(s.value),
-  );
-
-  const submit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    setSaving(true);
-    const result = await instructorsApi.changeStage(instructor.id, {
-      stage,
-      reason: reason.trim(),
-    });
-    setSaving(false);
-
-    if (result.ok) {
-      toast.success(result.message ?? 'Stage updated');
-      setOpen(false);
-      onDone();
-    } else {
-      // "Awaiting verification: PAN, POLICE_VERIFICATION" — the message names
-      // the rule and the documents, and that text is the whole value.
-      toast.error(result.error.message);
-    }
-  };
-
-  return (
-    <Fragment>
-      <Btn attrBtn={{ color: 'light', size: 'sm', onClick: () => void toggle() }}>
-        Stage
-      </Btn>
-      <Modal className='fade show' isOpen={open} toggle={() => void toggle()}>
-        <div className='modal-header'>
-          <H5
-            attrH5={{ className: 'modal-title' }}>{`Stage — ${instructor.name || instructor.user.mobile}`}</H5>
-          <Button
-            color='transparent'
-            className='btn-close float-end'
-            onClick={() => void toggle()}
-            type='button'
-            aria-label='Close'
-          />
-        </div>
-        <ModalBody>
-          {loading ? (
-            <p className='mb-0'>Loading…</p>
-          ) : offered.length === 0 ? (
-            // An already-approved trainer: the API refuses both decisions, so
-            // say so rather than showing a form that can only fail.
-            <p className='mb-0'>
-              No decision is open for this trainer — they are already approved.
-            </p>
-          ) : (
-            <Form className='needs-validation' onSubmit={submit}>
-              <div className='mb-3'>
-                <Label for='stage'>Stage *</Label>
-                <Input
-                  type='select'
-                  id='stage'
-                  required
-                  value={stage}
-                  onChange={(e) => setStage(e.target.value as OnboardingStage)}>
-                  {offered.map((s) => (
-                    <option key={s.value} value={s.value}>
-                      {s.label}
-                    </option>
-                  ))}
-                </Input>
-              </div>
-              {/* Not description: these are the live blockers the API measured,
-                  and without them Approve looks arbitrarily refused. */}
-              {blockers.length > 0 ? (
-                <ul className='mb-3 txt-danger'>
-                  {blockers.map((b) => (
-                    <li key={b}>{b}</li>
-                  ))}
-                </ul>
-              ) : null}
-              <div className='mb-3'>
-                <Label for='stageReason'>Reason *</Label>
-                <Input
-                  type='textarea'
-                  id='stageReason'
-                  rows={3}
-                  required
-                  minLength={3}
-                  value={reason}
-                  onChange={(e) => setReason(e.target.value)}
-                />
-              </div>
-              <Btn
-                attrBtn={{ color: 'primary', type: 'submit', disabled: saving }}>
-                {saving ? 'Saving…' : 'Save'}
-              </Btn>
-              <Btn
-                attrBtn={{
-                  color: 'secondary',
-                  className: 'm-l-5',
-                  type: 'button',
-                  onClick: () => void toggle(),
-                }}>
-                Cancel
-              </Btn>
-            </Form>
-          )}
-        </ModalBody>
-      </Modal>
-    </Fragment>
-  );
-};
-
-/** The document set, with verify and reject. `instructors:edit`. */
-const DocumentsModal = ({ instructor }: { instructor: Instructor }) => {
-  const [open, setOpen] = useState(false);
-  const [docs, setDocs] = useState<
-    { id: string; docType: string; verifyStatus: string; expiresAt: string | null; remarks: string | null }[]
-  >([]);
-  const [loading, setLoading] = useState(false);
-
-  const read = useCallback(async () => {
-    setLoading(true);
-    const result = await instructorsApi.get(instructor.id);
-    setLoading(false);
-    if (result.ok) setDocs(result.data.documents ?? []);
-    else toast.error(result.error.message);
-  }, [instructor.id]);
-
-  const decide = async (documentId: string, verifyStatus: 'VERIFIED' | 'REJECTED') => {
-    // A rejection must carry a remark — the API refuses without one and the
-    // teacher is told what to fix.
-    let remarks: string | undefined;
-    if (verifyStatus === 'REJECTED') {
-      const typed = window.prompt('Why is this being rejected?');
-      if (!typed || typed.trim().length < 3) return;
-      remarks = typed.trim();
-    }
-    const result = await instructorsApi.verifyDocument(
-      instructor.id,
-      documentId,
-      { verifyStatus, ...(remarks ? { remarks } : {}) },
-    );
-    if (result.ok) {
-      toast.success(result.message ?? 'Saved');
-      void read();
-    } else {
-      toast.error(result.error.message);
-    }
-  };
-
-  /**
-   * Opens the document in a new tab.
-   *
-   * The tab is claimed **synchronously on the click**, before the request for
-   * the signed URL. A browser only honours `window.open` while the user's
-   * gesture is still live, and an `await` spends it — so opening afterwards
-   * was silently blocked and showed as a tab that flashed and vanished with
-   * nothing in it. Here the blank tab exists first and only its location is
-   * set when the link arrives.
-   */
-  const openFile = (documentId: string) => {
-    const tab = window.open('', '_blank');
-
-    void (async () => {
-      const result = await instructorsApi.documentUrl(instructor.id, documentId);
-
-      if (result.ok && result.data?.url) {
-        // No tab at all means popups are blocked outright; say so rather than
-        // navigating the panel away from the review the admin is mid-way
-        // through.
-        if (tab) tab.location.href = result.data.url;
-        else toast.error('Allow pop-ups for this site to view documents');
-        return;
-      }
-
-      tab?.close();
-      if (!result.ok) toast.error(result.error.message);
-    })();
-  };
-
-  // Reads on click, not in an effect keyed on `open`: the table renders one of
-  // these per row, so an effect would be one detail call per row.
-  const toggle = async () => {
-    if (open) {
-      setOpen(false);
-      return;
-    }
-    setOpen(true);
-    await read();
-  };
-
-  return (
-    <Fragment>
-      <Btn
-        attrBtn={{ color: 'light', size: 'sm', onClick: () => void toggle() }}>
-        Documents
-      </Btn>
-      <Modal
-        className='fade show'
-        size='lg'
-        isOpen={open}
-        toggle={() => void toggle()}>
-        <div className='modal-header'>
-          <H5
-            attrH5={{ className: 'modal-title' }}>{`Documents — ${instructor.name || instructor.user.mobile}`}</H5>
-          <Button
-            color='transparent'
-            className='btn-close float-end'
-            onClick={() => void toggle()}
-            type='button'
-            aria-label='Close'
-          />
-        </div>
-        <ModalBody>
-          {loading ? (
-            <p className='mb-0'>Loading…</p>
-          ) : docs.length === 0 ? (
-            <p className='mb-0'>Nothing uploaded yet.</p>
-          ) : (
-            <table className='table'>
-              <thead>
-                <tr>
-                  <th scope='col'>Document</th>
-                  <th scope='col'>State</th>
-                  <th scope='col'>Expires</th>
-                  <th scope='col'>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {docs.map((d) => (
-                  <tr key={d.id}>
-                    <td>
-                      <div>{title(d.docType)}</div>
-                      {d.remarks ? (
-                        <span className='f-light f-12'>{d.remarks}</span>
-                      ) : null}
-                    </td>
-                    <td>{title(d.verifyStatus)}</td>
-                    <td>
-                      {d.expiresAt
-                        ? new Date(d.expiresAt).toLocaleDateString()
-                        : '—'}
-                    </td>
-                    <td>
-                      <div className='d-flex gap-2'>
-                        <Btn
-                          attrBtn={{
-                            color: 'light',
-                            size: 'sm',
-                            onClick: () => void openFile(d.id),
-                          }}>
-                          View
-                        </Btn>
-                        <Btn
-                          attrBtn={{
-                            color: 'primary',
-                            size: 'sm',
-                            onClick: () => void decide(d.id, 'VERIFIED'),
-                          }}>
-                          Verify
-                        </Btn>
-                        <Btn
-                          attrBtn={{
-                            color: 'danger',
-                            size: 'sm',
-                            outline: true,
-                            onClick: () => void decide(d.id, 'REJECTED'),
-                          }}>
-                          Reject
-                        </Btn>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </ModalBody>
-      </Modal>
-    </Fragment>
-  );
-};
-
 const Instructors = () => {
   const branches = useBranchOptions();
+  const servicesFor = useTrainerServiceOptions();
   const [stage, setStage] = useState('');
 
-  // This list has no "show deleted" flag at all, so CrudPage's switch is off.
-  //
-  // The API also filters on `kycStatus` and `status`. The client asked for
-  // neither as a control, so the columns show them and nothing filters on them.
+  // No "show deleted" flag on this list, so CrudPage's switch is off. The API
+  // also filters on `kycStatus` and `status`; the client asked for neither as
+  // a control, so those are shown and not filtered on.
   const load = useCallback(
     (query: { q?: string; page?: number }) =>
       instructorsApi.list({
@@ -454,7 +126,7 @@ const Instructors = () => {
     [stage],
   );
 
-  /** The four ops-owned scheduling numbers. */
+  /** The ops-owned fields: branch, the services allowed, the daily cap. */
   const fields: FieldDef<Instructor>[] = [
     {
       name: 'branchId',
@@ -464,8 +136,21 @@ const Instructors = () => {
       readValue: (r) => r.branchId ?? '',
     },
     { name: 'dailySessionCap', label: 'Daily session cap', type: 'number' },
-    { name: 'travelBufferMin', label: 'Travel buffer (minutes)', type: 'number' },
-    { name: 'travelRadiusKm', label: 'Travel radius (km)', type: 'number' },
+    {
+      name: 'serviceIds',
+      label: 'Services',
+      type: 'multiselect',
+      wide: true,
+      // Narrowed per row, which is why `options` is given the row: the
+      // catalogue is one list, but what this provider may deliver depends on
+      // the categories they chose at registration.
+      options: (_form, row) => servicesFor(row?.specialisations),
+      help: 'Only their registration categories. This is what the site shows.',
+      // The whole set goes on the wire — an id left out is withdrawn — so
+      // the value is every service currently active on the row.
+      readValue: (r) =>
+        (r.instructorServices ?? []).map((o) => o.serviceId).join(','),
+    },
   ];
 
   return (
@@ -479,12 +164,13 @@ const Instructors = () => {
       update={instructorsApi.update}
       canCreate={false}
       hasActiveFlag={false}
+      // Above Edit (client, 20-11-2026): look at the file, then change it.
+      rowView={(row) => <TrainerViewModal instructor={row} />}
       rowActions={(row, refresh) => (
         <Fragment>
           <DocumentsModal instructor={row} />
-          {/* PDF 6.5. Publishing a service here is what makes a provider
-              visible on the website at all — see OfferingsModal. */}
-          <OfferingsModal instructor={row} />
+          {/* No Services item: PDF 6.5's visibility switch is the Edit
+              dialog's Services select now (client, 20-11-2026). */}
           <StageModal instructor={row} onDone={refresh} />
         </Fragment>
       )}
