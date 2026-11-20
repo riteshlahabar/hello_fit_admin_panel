@@ -20,21 +20,22 @@
 // are narrowed to the categories the provider chose at registration, which is
 // what `specialisations` holds.
 //
-// **Stage and documents are not form fields.** Each is its own route with its
+// **Stage, status and documents are not form fields.** Each is its own route with its
 // own permission and its own refusals, so each is a dialog of its own in the
 // row menu: `StageModal.tsx`, `DocumentsModal.tsx`, and `TrainerViewModal.tsx`
-// above Edit. This file is the table and the fields only — the four were one
-// 538-line file until 20-11-2026.
+// above Edit. Status is the one exception: the client asked for it as a switch
+// in the row (20-11-2026), so `StatusToggle.tsx` renders in the Status column
+// and carries the reason dialog the route demands. This file is the table and
+// the fields only — the four were one 538-line file until 20-11-2026.
 
 import { Fragment, useCallback, useState } from 'react';
 import { Input } from 'reactstrap';
-import StatusBadge from '../Common/StatusBadge';
 import TrainerViewModal from './TrainerViewModal';
 import DocumentsModal from './DocumentsModal';
 import StageModal from './StageModal';
+import columns from './instructorColumns';
 import CrudPage from '../Common/CrudPage';
-import type { BadgeTone } from '../Common/StatusBadge';
-import type { ColumnDef, FieldDef } from '../Common/CrudPage';
+import type { FieldDef } from '../Common/CrudPage';
 import {
   instructorsApi,
   ONBOARDING_STAGES,
@@ -43,70 +44,6 @@ import {
 } from '../../Services/instructors.api';
 import { useBranchOptions } from '../Masters/useCityOptions';
 import { useTrainerServiceOptions } from './useTrainerServiceOptions';
-
-const STAGE_TONE: Record<OnboardingStage, BadgeTone> = {
-  APPLIED: 'light-secondary',
-  DOCUMENTS_SUBMITTED: 'light-info',
-  SCREENING_CALL: 'light-info',
-  DEMO_SESSION: 'light-primary',
-  APPROVED: 'light-success',
-  REJECTED: 'light-danger',
-};
-
-const title = (value: string) =>
-  value.charAt(0) + value.slice(1).toLowerCase().replace(/_/g, ' ');
-
-const columns: ColumnDef<Instructor>[] = [
-  {
-    header: 'Name',
-    cell: (r) => (
-      <div>
-        <div>{r.name || '—'}</div>
-        <span className='f-light f-12'>{r.user.mobile}</span>
-      </div>
-    ),
-  },
-  {
-    header: 'Stage',
-    cell: (r) => (
-      <StatusBadge tone={STAGE_TONE[r.onboardingStage]}>
-        {title(r.onboardingStage)}
-      </StatusBadge>
-    ),
-  },
-  // The four the client asked for on 19-11-2026, to judge an applicant from
-  // the list instead of opening each file.
-  {
-    header: 'Experience',
-    cell: (r) => (r.experienceYears > 0 ? `${r.experienceYears} yr` : '—'),
-  },
-  {
-    header: 'Qualification',
-    cell: (r) => (
-      <div>
-        <div>{r.qualification || '—'}</div>
-        {r.institute ? (
-          <span className='f-light f-12'>{r.institute}</span>
-        ) : null}
-      </div>
-    ),
-  },
-  { header: 'City', cell: (r) => r.city || '—' },
-  {
-    header: 'Specialisations',
-    cell: (r) =>
-      r.specialisations.length > 0 ? r.specialisations.join(', ') : '—',
-  },
-  // Null is survivable: assignment scores distance from the home base.
-  { header: 'Branch', cell: (r) => r.branch?.name ?? 'Unassigned' },
-  {
-    header: 'Rating',
-    cell: (r) =>
-      r.ratingCount > 0
-        ? `${Number(r.ratingAvg).toFixed(2)} (${r.ratingCount})`
-        : 'No reviews',
-  },
-];
 
 const Instructors = () => {
   const branches = useBranchOptions();

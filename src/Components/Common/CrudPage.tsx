@@ -101,7 +101,12 @@ export interface FieldDef<T> {
 
 export interface ColumnDef<T> {
   header: string;
-  cell: (row: T) => ReactNode;
+  /**
+   * `refresh` re-reads the current page — a cell that acts on its own route
+   * (Trainers' Status switch) needs it, since nothing it writes is in the
+   * row it was handed.
+   */
+  cell: (row: T, refresh: () => void) => ReactNode;
   /**
    * Share of the table for this column — a CSS width, normally a percentage.
    * `.hf-crud-table` is `table-layout: fixed`, which splits the width equally
@@ -471,7 +476,7 @@ const CrudPage = <T extends { id: string }>({
                       rows.map((row) => (
                         <tr key={row.id}>
                           {columns.map((c) => (
-                            <td key={c.header}>{c.cell(row)}</td>
+                            <td key={c.header}>{c.cell(row, () => void refresh())}</td>
                           ))}
                           <td>
                             {/* One dots menu per row (client, 18 Nov 2026):
