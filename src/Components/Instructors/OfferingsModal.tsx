@@ -11,31 +11,22 @@
 // `size='lg'` Cuba modal, and the detail call read **on click rather than in
 // an effect** — the table renders one of these per row, so an effect keyed on
 // `open` would fire a detail request for every row on every page load.
-//
-// Session formats live here rather than in the CrudPage edit form: they answer
-// the same question an administrator is already asking — what can this
-// provider be found for — and that form carries the four scheduling fields and
-// nothing else.
 
 import { Fragment, useCallback, useState } from 'react';
 import { Button, Modal, ModalBody } from 'reactstrap';
 import { toast } from 'react-toastify';
 import { Btn, H5 } from '../../AbstractElements';
 import OfferingsTable from './OfferingsTable';
-import SessionFormatPicker from './SessionFormatPicker';
 import {
   instructorsApi,
   type Instructor,
   type InstructorOffering,
-  type SessionFormat,
 } from '../../Services/instructors.api';
 
 const OfferingsModal = ({ instructor }: { instructor: Instructor }) => {
   const [open, setOpen] = useState(false);
   const [rows, setRows] = useState<InstructorOffering[]>([]);
-  const [formats, setFormats] = useState<SessionFormat[]>([]);
   const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
 
   const read = useCallback(async () => {
     setLoading(true);
@@ -43,7 +34,6 @@ const OfferingsModal = ({ instructor }: { instructor: Instructor }) => {
     setLoading(false);
     if (result.ok) {
       setRows(result.data.offerings ?? []);
-      setFormats(result.data.sessionFormats ?? []);
     } else {
       toast.error(result.error.message);
     }
@@ -61,30 +51,6 @@ const OfferingsModal = ({ instructor }: { instructor: Instructor }) => {
     } else {
       // The API refuses an approval when the service is retired or KYC is
       // unverified, and names which. Surfacing it is the point.
-      toast.error(result.error.message);
-    }
-  };
-
-  const toggleFormat = async (value: SessionFormat) => {
-    const next = formats.includes(value)
-      ? formats.filter((f) => f !== value)
-      : [...formats, value];
-
-    // The API refuses an empty list; refusing it here first says why rather
-    // than bouncing the administrator off a 400.
-    if (next.length === 0) {
-      toast.error('A trainer must offer at least one session location.');
-      return;
-    }
-
-    setSaving(true);
-    const result = await instructorsApi.update(instructor.id, { sessionFormats: next });
-    setSaving(false);
-
-    if (result.ok) {
-      setFormats(next);
-      toast.success('Session locations updated');
-    } else {
       toast.error(result.error.message);
     }
   };
@@ -119,12 +85,6 @@ const OfferingsModal = ({ instructor }: { instructor: Instructor }) => {
           />
         </div>
         <ModalBody>
-          <SessionFormatPicker
-            value={formats}
-            disabled={saving || loading}
-            onToggle={(value) => void toggleFormat(value)}
-          />
-
           {/* The one fact an administrator needs at a glance: approve nothing
               and this provider is invisible on the website. */}
           {!loading && approvedCount === 0 ? (

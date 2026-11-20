@@ -36,9 +36,6 @@ export type InstructorStatus = 'ACTIVE' | 'SUSPENDED' | 'BLACKLISTED';
 
 export type DutyStatus = 'ON_DUTY' | 'OFF_DUTY';
 
-/** Where a provider will hold a session. Drives PDF 5.5's website filter. */
-export type SessionFormat = 'CUSTOMER_HOME' | 'PROVIDER_LOCATION' | 'ONLINE';
-
 export type VerifyStatus = 'PENDING' | 'VERIFIED' | 'REJECTED';
 
 export interface Instructor {
@@ -55,7 +52,6 @@ export interface Instructor {
   city: string | null;
   /** Per-provider commission override as a percent; null uses the service's. */
   commissionPct: string | null;
-  sessionFormats: SessionFormat[];
   branchId: string | null;
   dailySessionCap: number;
   travelBufferMin: number;
@@ -195,11 +191,4 @@ export const ONBOARDING_STAGES: { value: OnboardingStage; label: string }[] = [
   { value: 'DEMO_SESSION', label: 'Demo session' },
   { value: 'APPROVED', label: 'Approved' },
   { value: 'REJECTED', label: 'Rejected' },
-];
-
-/** The three session formats, for the provider detail editor. */
-export const SESSION_FORMATS: { value: SessionFormat; label: string }[] = [
-  { value: 'CUSTOMER_HOME', label: "At the customer's home" },
-  { value: 'PROVIDER_LOCATION', label: "At the provider's location" },
-  { value: 'ONLINE', label: 'Online' },
 ];
