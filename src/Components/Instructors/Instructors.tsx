@@ -285,10 +285,34 @@ const DocumentsModal = ({ instructor }: { instructor: Instructor }) => {
     }
   };
 
-  const openFile = async (documentId: string) => {
-    const result = await instructorsApi.documentUrl(instructor.id, documentId);
-    if (result.ok && result.data?.url) window.open(result.data.url, '_blank');
-    else if (!result.ok) toast.error(result.error.message);
+  /**
+   * Opens the document in a new tab.
+   *
+   * The tab is claimed **synchronously on the click**, before the request for
+   * the signed URL. A browser only honours `window.open` while the user's
+   * gesture is still live, and an `await` spends it — so opening afterwards
+   * was silently blocked and showed as a tab that flashed and vanished with
+   * nothing in it. Here the blank tab exists first and only its location is
+   * set when the link arrives.
+   */
+  const openFile = (documentId: string) => {
+    const tab = window.open('', '_blank');
+
+    void (async () => {
+      const result = await instructorsApi.documentUrl(instructor.id, documentId);
+
+      if (result.ok && result.data?.url) {
+        // No tab at all means popups are blocked outright; say so rather than
+        // navigating the panel away from the review the admin is mid-way
+        // through.
+        if (tab) tab.location.href = result.data.url;
+        else toast.error('Allow pop-ups for this site to view documents');
+        return;
+      }
+
+      tab?.close();
+      if (!result.ok) toast.error(result.error.message);
+    })();
   };
 
   // Reads on click, not in an effect keyed on `open`: the table renders one of
