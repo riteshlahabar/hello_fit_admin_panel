@@ -183,12 +183,21 @@ export const instructorsApi = {
     ),
 };
 
-/** Stage order, for the stage dialog's select. */
+/**
+ * Stage order, for the list filter. Screening call and demo session are off
+ * the pipeline (client, 20-11-2026) so they are not offered; the Prisma enum
+ * still carries them, so a row stranded in one keeps rendering its badge.
+ */
 export const ONBOARDING_STAGES: { value: OnboardingStage; label: string }[] = [
   { value: 'APPLIED', label: 'Applied' },
   { value: 'DOCUMENTS_SUBMITTED', label: 'Documents submitted' },
-  { value: 'SCREENING_CALL', label: 'Screening call' },
-  { value: 'DEMO_SESSION', label: 'Demo session' },
   { value: 'APPROVED', label: 'Approved' },
   { value: 'REJECTED', label: 'Rejected' },
 ];
+
+/**
+ * The only stages the Stage dialog offers (client, 20-11-2026). Admin decides;
+ * the pipeline steps in between are not an admin action. Still intersected
+ * with the API's `allowedStages`, which is the authority on what it will take.
+ */
+export const DECIDABLE_STAGES: OnboardingStage[] = ['APPROVED', 'REJECTED'];

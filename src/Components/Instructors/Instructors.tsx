@@ -21,7 +21,8 @@
 // must-verify document is unverified or expired — naming which one. That
 // refusal is the whole value of the route, so this screen surfaces it rather
 // than trying to predict it; the dialog offers the stages the API said are
-// reachable (`allowedStages` from the detail call) and nothing more.
+// reachable (`allowedStages` from the detail call), narrowed to Approved and
+// Rejected — the only two decisions admin makes (client, 20-11-2026).
 
 import { Fragment, useCallback, useState } from 'react';
 import { Button, Form, Input, Label, Modal, ModalBody } from 'reactstrap';
@@ -34,6 +35,7 @@ import type { BadgeTone } from '../Common/StatusBadge';
 import type { ColumnDef, FieldDef } from '../Common/CrudPage';
 import {
   instructorsApi,
+  DECIDABLE_STAGES,
   ONBOARDING_STAGES,
   type Instructor,
   type OnboardingStage,
@@ -139,12 +141,24 @@ const StageModal = ({
     const result = await instructorsApi.get(instructor.id);
     setLoading(false);
     if (result.ok) {
-      setAllowed(result.data.allowedStages ?? []);
+      const reachable = result.data.allowedStages ?? [];
+      setAllowed(reachable);
+      // The select only lists Approved and Rejected, so the current stage is
+      // usually not among them — start on the first option actually shown, or
+      // submit would post a stage nobody chose.
+      const offered = DECIDABLE_STAGES.filter((s) => reachable.includes(s));
+      if (offered.length > 0 && !offered.includes(instructor.onboardingStage)) {
+        setStage(offered[0]);
+      }
       setBlockers(result.data.approval?.ok ? [] : (result.data.approval?.reasons ?? []));
     } else {
       toast.error(result.error.message);
     }
   };
+
+  const offered = ONBOARDING_STAGES.filter(
+    (s) => DECIDABLE_STAGES.includes(s.value) && allowed.includes(s.value),
+  );
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -186,6 +200,12 @@ const StageModal = ({
         <ModalBody>
           {loading ? (
             <p className='mb-0'>Loading…</p>
+          ) : offered.length === 0 ? (
+            // An already-approved trainer: the API refuses both decisions, so
+            // say so rather than showing a form that can only fail.
+            <p className='mb-0'>
+              No decision is open for this trainer — they are already approved.
+            </p>
           ) : (
             <Form className='needs-validation' onSubmit={submit}>
               <div className='mb-3'>
@@ -196,9 +216,7 @@ const StageModal = ({
                   required
                   value={stage}
                   onChange={(e) => setStage(e.target.value as OnboardingStage)}>
-                  {ONBOARDING_STAGES.filter((s) =>
-                    allowed.includes(s.value),
-                  ).map((s) => (
+                  {offered.map((s) => (
                     <option key={s.value} value={s.value}>
                       {s.label}
                     </option>
